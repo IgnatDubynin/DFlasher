@@ -1,0 +1,3 @@
+﻿timestamp_ms;event;details
+0;session_start;startFreq=40;stepHz=5;stepTime=500;target=17
+3847.105;keypress;vk=100

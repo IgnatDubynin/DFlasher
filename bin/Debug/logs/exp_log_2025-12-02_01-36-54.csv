@@ -1,0 +1,3 @@
+﻿timestamp_ms;event;details
+0;session_start;startFreq=40;stepHz=5;stepTime=500;target=32
+9429.874;experiment_stopped;reason=Потеря связи с устройством

@@ -1,0 +1,11 @@
+﻿timestamp_ms;event;details
+0;session_start;startFreq=40;stepHz=5;stepTime=500;target=37
+11458.088;keypress;vk=99
+12176.304;answer;input=37;target=37;correct=1;CurFreq=18;σ=∞
+12176.304;jump;NewStartFreq=13;dir=up
+18701.33;keypress;vk=97
+19218.913;answer;input=18;target=18;correct=1;CurFreq=26;σ=5.657
+19218.913;jump;NewStartFreq=31;dir=down
+25496.365;keypress;vk=98
+25969.041;answer;input=24;target=24;correct=1;CurFreq=19;σ=4.359
+25969.041;stop;σ-threshold reached;freq=19;σ=4.359

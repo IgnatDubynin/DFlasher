@@ -15,9 +15,9 @@ namespace DFlasher
     }
     public class Configuration
     {
-        public int StartingFreq { get; set; } = 60;
-        public int StepJumpFreq { get; set; } = 10;
-        public int TimeStepFreqChngMs { get; set; } = 500;
+        public int StartingFreq { get; set; } = 30;
+        public int StepJumpFreq { get; set; } = 5;
+        public int TimeStepFreqChngMs { get; set; } = 1000;
         public int StepClarifyThrshldHz { get; set; } = 20;
         public int StdDevIn3Itrtn { get; set; } = 3;
 
@@ -27,7 +27,7 @@ namespace DFlasher
         public ExperimentMode Mode { get; set; } = ExperimentMode.Staircase;
 
         // Sequential режим (минимальные настройки)
-        public int SequentialStartingFreq { get; set; } = 60;
+        public int SequentialStartingFreq { get; set; } = 30;
         public int SequentialTrials { get; set; } = 20;
         public int SequentialBrightness { get; set; } = 2;
         public int SequentialDirection { get; set; } = -1; // -1 = вниз, +1 = вверх (пока без UI)

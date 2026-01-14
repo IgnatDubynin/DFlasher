@@ -169,6 +169,9 @@ namespace DFlasher
                                     return;
                                 }
                                 CurrentFreq--;
+                                // новая случайная цифра
+                                TwoDigitNumber = _rnd.Next(10, 100);
+                                comm.WriteData(CurrentDigitCmd + ToHardwareDigit(TwoDigitNumber));
                             }
                             else
                             {
@@ -191,6 +194,9 @@ namespace DFlasher
                                     return;
                                 }
                                 CurrentFreq++;
+                                // новая случайная цифра
+                                TwoDigitNumber = _rnd.Next(10, 100);
+                                comm.WriteData(CurrentDigitCmd + ToHardwareDigit(TwoDigitNumber));
                             }
                             else
                             {
@@ -1023,10 +1029,14 @@ namespace DFlasher
 
             // Зафиксируем текущее состояние
             QueryPerformanceCounter(out long pcNow);
-            Logger.WriteLog(pcNow, "session_stop", $"reason=manual;freq={CurrentFreq}");
+ //           Logger.WriteLog(pcNow, "session_stop", $"reason=manual;freq={CurrentFreq}");
+            Logger.WriteLog(pcNow, "session_stop", $"reason=manual;freq={CurrentFreq} target_final= {TwoDigitNumber}");
+
 
             // Вернуть стимуляцию к начальному значению (если так задумано)
             comm.WriteData(CurrentFreqCmd + Cfg.StartingFreq.ToString());
+                        Logger.WriteLog(pcNow, "session_stop", $"reason=manual;freq={CurrentFreq} target_final= {TwoDigitNumber}");
+
 
             Logger.Flush();
 
@@ -1063,7 +1073,7 @@ namespace DFlasher
             comm.WriteData(CurrentFreqCmd + startFreq);*/
 
 
-            CurrentFreq = 40;
+            CurrentFreq = 30;
            //
            //comm.WriteData(CurrentFreqCmd + CurrentFreq.ToString());
             //Thread.Sleep(10);

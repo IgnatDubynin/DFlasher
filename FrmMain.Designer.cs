@@ -779,7 +779,7 @@ namespace DFlasher
             this.numUpDwnTimeStepFreqChng.Size = new System.Drawing.Size(50, 20);
             this.numUpDwnTimeStepFreqChng.TabIndex = 75;
             this.numUpDwnTimeStepFreqChng.Value = new decimal(new int[] {
-            500,
+            1000,
             0,
             0,
             0});
@@ -791,7 +791,7 @@ namespace DFlasher
             this.numUpDwnStepFreqHz.Size = new System.Drawing.Size(50, 20);
             this.numUpDwnStepFreqHz.TabIndex = 74;
             this.numUpDwnStepFreqHz.Value = new decimal(new int[] {
-            10,
+            5,
             0,
             0,
             0});
@@ -808,7 +808,7 @@ namespace DFlasher
             this.numUpDwnStartingFreq.Size = new System.Drawing.Size(50, 20);
             this.numUpDwnStartingFreq.TabIndex = 73;
             this.numUpDwnStartingFreq.Value = new decimal(new int[] {
-            40,
+            30,
             0,
             0,
             0});

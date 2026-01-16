@@ -31,6 +31,7 @@ namespace DFlasher
         public int SequentialTrials { get; set; } = 20;
         public int SequentialBrightness { get; set; } = 2;
         public int SequentialDirection { get; set; } = -1; // -1 = вниз, +1 = вверх (пока без UI)
+        public int NeedSwapDigits { get; set; } = 0; //для старого макета надо переставлять цифры (0), для нового нет (1)
 
 
         public static Configuration Load(string fileName)

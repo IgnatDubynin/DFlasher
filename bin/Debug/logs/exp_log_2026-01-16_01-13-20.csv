@@ -1,0 +1,13 @@
+﻿timestamp_ms;event;details
+0;session_start;startFreq=40;stepHz=5;stepTime=500;target=36
+14786.146;keypress;vk=12
+20679.424;answer;input=51;target=62;correct=0;CurFreq=11
+20679.424;jump;NewStartFreq=6;dir=up
+31726.98;keypress;vk=104
+32199.431;answer;input=86;target=98;correct=0;CurFreq=28
+32199.431;jump;NewStartFreq=33;dir=down
+44281.91;keypress;vk=98
+44754.434;answer;input=29;target=86;correct=0;CurFreq=9
+44754.434;jump;NewStartFreq=4;dir=up
+50295.609;session_stop;reason=manual;freq=15 target_final= 71
+50295.609;session_stop;reason=manual;freq=15 target_final= 71

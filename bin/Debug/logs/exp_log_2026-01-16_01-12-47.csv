@@ -1,0 +1,4 @@
+﻿timestamp_ms;event;details
+0;session_start;startFreq=40;stepHz=5;stepTime=500;target=92
+1126.473;session_stop;reason=manual;freq=38 target_final= 90
+1126.473;session_stop;reason=manual;freq=38 target_final= 90

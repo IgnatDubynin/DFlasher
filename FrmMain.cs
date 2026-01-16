@@ -104,6 +104,7 @@ namespace DFlasher
         private int CurrentFreq;
         private int CurrentIteration;
         private int CurrentThreshold;
+        private static int NeedSwapDigits;
         private double AvgThreshold = 0;
         private List<double> _allThresholds = new List<double>();
         // направление «ползания»: -1 — вниз, +1 — вверх
@@ -570,14 +571,20 @@ namespace DFlasher
         // ==== хелпер: логическое → для железа (перевернуть цифры) ====
         private static int ToHardwareDigit(int n)
         {
-/*            // на всякий случай нормализуем в диапазон 0..99
-            if (n < 0) n = 0;
-            if (n > 99) n = n % 100;
+            if (NeedSwapDigits == 1)
+            {
+                // на всякий случай нормализуем в диапазон 0..99
+                if (n < 0) n = 0;
+                if (n > 99) n = n % 100;
 
-            int tens = n / 10;
-            int ones = n % 10;
-            return ones * 10 + tens; // 13 -> 31, 07 -> 70, 5 -> 50*/
-            return n;
+                int tens = n / 10;
+                int ones = n % 10;
+                return ones * 10 + tens; // 13 -> 31, 07 -> 70, 5 -> 50
+            }
+            else
+            {
+                return n;
+            }
         }
         private void AutoConnectCh340()
         {
@@ -681,6 +688,7 @@ namespace DFlasher
             Cfg = Configuration.Load(configFile);
 
             CurrentFreq = Cfg.StartingFreq;
+            NeedSwapDigits = Cfg.NeedSwapDigits;
 
             LoadComPortValues();
             SetComPortDefaults();

@@ -31,6 +31,39 @@ namespace DFlasher
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.grpBxExperimentMode = new System.Windows.Forms.GroupBox();
+            this.rdoBtnSequential = new System.Windows.Forms.RadioButton();
+            this.rdoBtnStaircase = new System.Windows.Forms.RadioButton();
+            this.tabControl2 = new System.Windows.Forms.TabControl();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.numUpDwnStepClarifyThrshld = new System.Windows.Forms.NumericUpDown();
+            this.numUpDwnStdDevIn3Itrtn = new System.Windows.Forms.NumericUpDown();
+            this.numUpDwnTimeStepFreqChng = new System.Windows.Forms.NumericUpDown();
+            this.numUpDwnStepFreqHz = new System.Windows.Forms.NumericUpDown();
+            this.numUpDwnStartingFreq = new System.Windows.Forms.NumericUpDown();
+            this.numUpDwnBrightness = new System.Windows.Forms.NumericUpDown();
+            this.label26 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.numUpDwnBrightnessSequentialMode = new System.Windows.Forms.NumericUpDown();
+            this.label30 = new System.Windows.Forms.Label();
+            this.numUpDwnTrialCount = new System.Windows.Forms.NumericUpDown();
+            this.label31 = new System.Windows.Forms.Label();
+            this.numUpDwnTimeStepFreqChngSequentialMode = new System.Windows.Forms.NumericUpDown();
+            this.label28 = new System.Windows.Forms.Label();
+            this.label29 = new System.Windows.Forms.Label();
+            this.numUpDwnStartingFreqSequentialMode = new System.Windows.Forms.NumericUpDown();
+            this.label25 = new System.Windows.Forms.Label();
+            this.label27 = new System.Windows.Forms.Label();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.txtBxCurSigma = new System.Windows.Forms.TextBox();
             this.label24 = new System.Windows.Forms.Label();
@@ -81,50 +114,14 @@ namespace DFlasher
             this.btnDebug = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.tabControl2 = new System.Windows.Forms.TabControl();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.numUpDwnStepClarifyThrshld = new System.Windows.Forms.NumericUpDown();
-            this.numUpDwnStdDevIn3Itrtn = new System.Windows.Forms.NumericUpDown();
-            this.numUpDwnTimeStepFreqChng = new System.Windows.Forms.NumericUpDown();
-            this.numUpDwnStepFreqHz = new System.Windows.Forms.NumericUpDown();
-            this.numUpDwnStartingFreq = new System.Windows.Forms.NumericUpDown();
-            this.numUpDwnBrightness = new System.Windows.Forms.NumericUpDown();
-            this.label26 = new System.Windows.Forms.Label();
-            this.label18 = new System.Windows.Forms.Label();
-            this.label15 = new System.Windows.Forms.Label();
-            this.label16 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.numUpDwnTimeStepFreqChngSequentialMode = new System.Windows.Forms.NumericUpDown();
-            this.label28 = new System.Windows.Forms.Label();
-            this.label29 = new System.Windows.Forms.Label();
-            this.numUpDwnStartingFreqSequentialMode = new System.Windows.Forms.NumericUpDown();
-            this.label25 = new System.Windows.Forms.Label();
-            this.label27 = new System.Windows.Forms.Label();
-            this.grpBxExperimentMode = new System.Windows.Forms.GroupBox();
-            this.rdoBtnSequential = new System.Windows.Forms.RadioButton();
-            this.rdoBtnStaircase = new System.Windows.Forms.RadioButton();
-            this.numUpDwnTrialCount = new System.Windows.Forms.NumericUpDown();
-            this.label31 = new System.Windows.Forms.Label();
-            this.numUpDwnBrightnessSequentialMode = new System.Windows.Forms.NumericUpDown();
-            this.label30 = new System.Windows.Forms.Label();
+            this.chckBxNeedRndDigits = new System.Windows.Forms.CheckBox();
+            this.numUpDwnItrtnCount = new System.Windows.Forms.NumericUpDown();
+            this.txtBxDigitsForExclusion = new System.Windows.Forms.TextBox();
+            this.label32 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.groupBox8.SuspendLayout();
-            this.tabPage2.SuspendLayout();
-            this.groupBox4.SuspendLayout();
-            this.groupBox7.SuspendLayout();
-            this.groupBox6.SuspendLayout();
-            this.GroupBox1.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.groupBox2.SuspendLayout();
             this.groupBox5.SuspendLayout();
+            this.grpBxExperimentMode.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStepClarifyThrshld)).BeginInit();
@@ -134,11 +131,19 @@ namespace DFlasher
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStartingFreq)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnBrightness)).BeginInit();
             this.tabPage4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnBrightnessSequentialMode)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTrialCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTimeStepFreqChngSequentialMode)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStartingFreqSequentialMode)).BeginInit();
-            this.grpBxExperimentMode.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTrialCount)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnBrightnessSequentialMode)).BeginInit();
+            this.groupBox8.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.groupBox4.SuspendLayout();
+            this.groupBox7.SuspendLayout();
+            this.groupBox6.SuspendLayout();
+            this.GroupBox1.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnItrtnCount)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -162,6 +167,434 @@ namespace DFlasher
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "MainTab";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.grpBxExperimentMode);
+            this.groupBox5.Controls.Add(this.tabControl2);
+            this.groupBox5.Location = new System.Drawing.Point(6, 9);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(369, 414);
+            this.groupBox5.TabIndex = 4;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "ExpSettings";
+            // 
+            // grpBxExperimentMode
+            // 
+            this.grpBxExperimentMode.Controls.Add(this.label32);
+            this.grpBxExperimentMode.Controls.Add(this.txtBxDigitsForExclusion);
+            this.grpBxExperimentMode.Controls.Add(this.chckBxNeedRndDigits);
+            this.grpBxExperimentMode.Controls.Add(this.rdoBtnSequential);
+            this.grpBxExperimentMode.Controls.Add(this.rdoBtnStaircase);
+            this.grpBxExperimentMode.Location = new System.Drawing.Point(6, 252);
+            this.grpBxExperimentMode.Name = "grpBxExperimentMode";
+            this.grpBxExperimentMode.Size = new System.Drawing.Size(353, 143);
+            this.grpBxExperimentMode.TabIndex = 4;
+            this.grpBxExperimentMode.TabStop = false;
+            this.grpBxExperimentMode.Text = "ExperimentMode";
+            // 
+            // rdoBtnSequential
+            // 
+            this.rdoBtnSequential.AutoSize = true;
+            this.rdoBtnSequential.Location = new System.Drawing.Point(9, 109);
+            this.rdoBtnSequential.Name = "rdoBtnSequential";
+            this.rdoBtnSequential.Size = new System.Drawing.Size(75, 17);
+            this.rdoBtnSequential.TabIndex = 1;
+            this.rdoBtnSequential.Text = "Sequential";
+            this.rdoBtnSequential.UseVisualStyleBackColor = true;
+            this.rdoBtnSequential.Visible = false;
+            // 
+            // rdoBtnStaircase
+            // 
+            this.rdoBtnStaircase.AutoSize = true;
+            this.rdoBtnStaircase.Checked = true;
+            this.rdoBtnStaircase.Location = new System.Drawing.Point(9, 86);
+            this.rdoBtnStaircase.Name = "rdoBtnStaircase";
+            this.rdoBtnStaircase.Size = new System.Drawing.Size(69, 17);
+            this.rdoBtnStaircase.TabIndex = 0;
+            this.rdoBtnStaircase.TabStop = true;
+            this.rdoBtnStaircase.Text = "Staircase";
+            this.rdoBtnStaircase.UseVisualStyleBackColor = true;
+            this.rdoBtnStaircase.Visible = false;
+            // 
+            // tabControl2
+            // 
+            this.tabControl2.Controls.Add(this.tabPage3);
+            this.tabControl2.Controls.Add(this.tabPage4);
+            this.tabControl2.Location = new System.Drawing.Point(4, 19);
+            this.tabControl2.Name = "tabControl2";
+            this.tabControl2.SelectedIndex = 0;
+            this.tabControl2.Size = new System.Drawing.Size(359, 227);
+            this.tabControl2.TabIndex = 3;
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.numUpDwnItrtnCount);
+            this.tabPage3.Controls.Add(this.numUpDwnStepClarifyThrshld);
+            this.tabPage3.Controls.Add(this.numUpDwnStdDevIn3Itrtn);
+            this.tabPage3.Controls.Add(this.numUpDwnTimeStepFreqChng);
+            this.tabPage3.Controls.Add(this.numUpDwnStepFreqHz);
+            this.tabPage3.Controls.Add(this.numUpDwnStartingFreq);
+            this.tabPage3.Controls.Add(this.numUpDwnBrightness);
+            this.tabPage3.Controls.Add(this.label26);
+            this.tabPage3.Controls.Add(this.label18);
+            this.tabPage3.Controls.Add(this.label15);
+            this.tabPage3.Controls.Add(this.label16);
+            this.tabPage3.Controls.Add(this.label13);
+            this.tabPage3.Controls.Add(this.label14);
+            this.tabPage3.Controls.Add(this.label11);
+            this.tabPage3.Controls.Add(this.label12);
+            this.tabPage3.Controls.Add(this.label10);
+            this.tabPage3.Controls.Add(this.label9);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(351, 201);
+            this.tabPage3.TabIndex = 0;
+            this.tabPage3.Text = "Staircase";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // numUpDwnStepClarifyThrshld
+            // 
+            this.numUpDwnStepClarifyThrshld.Enabled = false;
+            this.numUpDwnStepClarifyThrshld.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.numUpDwnStepClarifyThrshld.Location = new System.Drawing.Point(253, 89);
+            this.numUpDwnStepClarifyThrshld.Name = "numUpDwnStepClarifyThrshld";
+            this.numUpDwnStepClarifyThrshld.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnStepClarifyThrshld.TabIndex = 77;
+            this.numUpDwnStepClarifyThrshld.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            // 
+            // numUpDwnStdDevIn3Itrtn
+            // 
+            this.numUpDwnStdDevIn3Itrtn.Location = new System.Drawing.Point(253, 115);
+            this.numUpDwnStdDevIn3Itrtn.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numUpDwnStdDevIn3Itrtn.Name = "numUpDwnStdDevIn3Itrtn";
+            this.numUpDwnStdDevIn3Itrtn.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnStdDevIn3Itrtn.TabIndex = 76;
+            this.numUpDwnStdDevIn3Itrtn.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            // 
+            // numUpDwnTimeStepFreqChng
+            // 
+            this.numUpDwnTimeStepFreqChng.Location = new System.Drawing.Point(253, 63);
+            this.numUpDwnTimeStepFreqChng.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numUpDwnTimeStepFreqChng.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numUpDwnTimeStepFreqChng.Name = "numUpDwnTimeStepFreqChng";
+            this.numUpDwnTimeStepFreqChng.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnTimeStepFreqChng.TabIndex = 75;
+            this.numUpDwnTimeStepFreqChng.Value = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            // 
+            // numUpDwnStepFreqHz
+            // 
+            this.numUpDwnStepFreqHz.Location = new System.Drawing.Point(253, 37);
+            this.numUpDwnStepFreqHz.Name = "numUpDwnStepFreqHz";
+            this.numUpDwnStepFreqHz.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnStepFreqHz.TabIndex = 74;
+            this.numUpDwnStepFreqHz.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            // 
+            // numUpDwnStartingFreq
+            // 
+            this.numUpDwnStartingFreq.Location = new System.Drawing.Point(253, 11);
+            this.numUpDwnStartingFreq.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numUpDwnStartingFreq.Name = "numUpDwnStartingFreq";
+            this.numUpDwnStartingFreq.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnStartingFreq.TabIndex = 73;
+            this.numUpDwnStartingFreq.Value = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            // 
+            // numUpDwnBrightness
+            // 
+            this.numUpDwnBrightness.Location = new System.Drawing.Point(253, 141);
+            this.numUpDwnBrightness.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numUpDwnBrightness.Name = "numUpDwnBrightness";
+            this.numUpDwnBrightness.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnBrightness.TabIndex = 72;
+            this.numUpDwnBrightness.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(12, 143);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(98, 13);
+            this.label26.TabIndex = 71;
+            this.label26.Text = "Brightness, 0...255:";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(12, 117);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(245, 13);
+            this.label18.TabIndex = 70;
+            this.label18.Text = "Std Dev of Thresh in        3        consecutive itrtns:";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(309, 91);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(20, 13);
+            this.label15.TabIndex = 69;
+            this.label15.Text = "Hz";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(12, 91);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(125, 13);
+            this.label16.TabIndex = 68;
+            this.label16.Text = "Step to Clarify Threshold:";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(309, 65);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(20, 13);
+            this.label13.TabIndex = 67;
+            this.label13.Text = "ms";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(12, 65);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(121, 13);
+            this.label14.TabIndex = 66;
+            this.label14.Text = "Time Step Freq change:";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(309, 39);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(20, 13);
+            this.label11.TabIndex = 65;
+            this.label11.Text = "Hz";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(12, 39);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(56, 13);
+            this.label12.TabIndex = 64;
+            this.label12.Text = "Step Freq:";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(309, 13);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(20, 13);
+            this.label10.TabIndex = 63;
+            this.label10.Text = "Hz";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(12, 13);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(70, 13);
+            this.label9.TabIndex = 62;
+            this.label9.Text = "Starting Freq:";
+            // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.numUpDwnBrightnessSequentialMode);
+            this.tabPage4.Controls.Add(this.label30);
+            this.tabPage4.Controls.Add(this.numUpDwnTrialCount);
+            this.tabPage4.Controls.Add(this.label31);
+            this.tabPage4.Controls.Add(this.numUpDwnTimeStepFreqChngSequentialMode);
+            this.tabPage4.Controls.Add(this.label28);
+            this.tabPage4.Controls.Add(this.label29);
+            this.tabPage4.Controls.Add(this.numUpDwnStartingFreqSequentialMode);
+            this.tabPage4.Controls.Add(this.label25);
+            this.tabPage4.Controls.Add(this.label27);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(351, 201);
+            this.tabPage4.TabIndex = 1;
+            this.tabPage4.Text = "Sequential";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // numUpDwnBrightnessSequentialMode
+            // 
+            this.numUpDwnBrightnessSequentialMode.Location = new System.Drawing.Point(253, 82);
+            this.numUpDwnBrightnessSequentialMode.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numUpDwnBrightnessSequentialMode.Name = "numUpDwnBrightnessSequentialMode";
+            this.numUpDwnBrightnessSequentialMode.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnBrightnessSequentialMode.TabIndex = 74;
+            this.numUpDwnBrightnessSequentialMode.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(12, 84);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(98, 13);
+            this.label30.TabIndex = 73;
+            this.label30.Text = "Brightness, 0...255:";
+            // 
+            // numUpDwnTrialCount
+            // 
+            this.numUpDwnTrialCount.Location = new System.Drawing.Point(253, 56);
+            this.numUpDwnTrialCount.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numUpDwnTrialCount.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numUpDwnTrialCount.Name = "numUpDwnTrialCount";
+            this.numUpDwnTrialCount.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnTrialCount.TabIndex = 66;
+            this.numUpDwnTrialCount.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(12, 58);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(60, 13);
+            this.label31.TabIndex = 64;
+            this.label31.Text = "Trial count:";
+            // 
+            // numUpDwnTimeStepFreqChngSequentialMode
+            // 
+            this.numUpDwnTimeStepFreqChngSequentialMode.Enabled = false;
+            this.numUpDwnTimeStepFreqChngSequentialMode.Location = new System.Drawing.Point(253, 30);
+            this.numUpDwnTimeStepFreqChngSequentialMode.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numUpDwnTimeStepFreqChngSequentialMode.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numUpDwnTimeStepFreqChngSequentialMode.Name = "numUpDwnTimeStepFreqChngSequentialMode";
+            this.numUpDwnTimeStepFreqChngSequentialMode.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnTimeStepFreqChngSequentialMode.TabIndex = 63;
+            this.numUpDwnTimeStepFreqChngSequentialMode.Value = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(309, 32);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(20, 13);
+            this.label28.TabIndex = 62;
+            this.label28.Text = "ms";
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(12, 32);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(121, 13);
+            this.label29.TabIndex = 61;
+            this.label29.Text = "Time Step Freq change:";
+            // 
+            // numUpDwnStartingFreqSequentialMode
+            // 
+            this.numUpDwnStartingFreqSequentialMode.Location = new System.Drawing.Point(253, 4);
+            this.numUpDwnStartingFreqSequentialMode.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numUpDwnStartingFreqSequentialMode.Name = "numUpDwnStartingFreqSequentialMode";
+            this.numUpDwnStartingFreqSequentialMode.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnStartingFreqSequentialMode.TabIndex = 60;
+            this.numUpDwnStartingFreqSequentialMode.Value = new decimal(new int[] {
+            40,
+            0,
+            0,
+            0});
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(309, 6);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(20, 13);
+            this.label25.TabIndex = 59;
+            this.label25.Text = "Hz";
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(12, 6);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(70, 13);
+            this.label27.TabIndex = 58;
+            this.label27.Text = "Starting Freq:";
             // 
             // groupBox8
             // 
@@ -303,7 +736,7 @@ namespace DFlasher
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(745, 441);
+            this.tabPage2.Size = new System.Drawing.Size(804, 442);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Settings";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -684,427 +1117,55 @@ namespace DFlasher
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
-            // groupBox5
+            // chckBxNeedRndDigits
             // 
-            this.groupBox5.Controls.Add(this.grpBxExperimentMode);
-            this.groupBox5.Controls.Add(this.tabControl2);
-            this.groupBox5.Location = new System.Drawing.Point(6, 9);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(369, 333);
-            this.groupBox5.TabIndex = 4;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "ExpSettings";
+            this.chckBxNeedRndDigits.AutoSize = true;
+            this.chckBxNeedRndDigits.Checked = true;
+            this.chckBxNeedRndDigits.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chckBxNeedRndDigits.Location = new System.Drawing.Point(9, 19);
+            this.chckBxNeedRndDigits.Name = "chckBxNeedRndDigits";
+            this.chckBxNeedRndDigits.Size = new System.Drawing.Size(124, 17);
+            this.chckBxNeedRndDigits.TabIndex = 2;
+            this.chckBxNeedRndDigits.Text = "Need Random Digits";
+            this.chckBxNeedRndDigits.UseVisualStyleBackColor = true;
             // 
-            // tabControl2
+            // numUpDwnItrtnCount
             // 
-            this.tabControl2.Controls.Add(this.tabPage3);
-            this.tabControl2.Controls.Add(this.tabPage4);
-            this.tabControl2.Location = new System.Drawing.Point(4, 19);
-            this.tabControl2.Name = "tabControl2";
-            this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(359, 227);
-            this.tabControl2.TabIndex = 3;
-            // 
-            // tabPage3
-            // 
-            this.tabPage3.Controls.Add(this.numUpDwnStepClarifyThrshld);
-            this.tabPage3.Controls.Add(this.numUpDwnStdDevIn3Itrtn);
-            this.tabPage3.Controls.Add(this.numUpDwnTimeStepFreqChng);
-            this.tabPage3.Controls.Add(this.numUpDwnStepFreqHz);
-            this.tabPage3.Controls.Add(this.numUpDwnStartingFreq);
-            this.tabPage3.Controls.Add(this.numUpDwnBrightness);
-            this.tabPage3.Controls.Add(this.label26);
-            this.tabPage3.Controls.Add(this.label18);
-            this.tabPage3.Controls.Add(this.label15);
-            this.tabPage3.Controls.Add(this.label16);
-            this.tabPage3.Controls.Add(this.label13);
-            this.tabPage3.Controls.Add(this.label14);
-            this.tabPage3.Controls.Add(this.label11);
-            this.tabPage3.Controls.Add(this.label12);
-            this.tabPage3.Controls.Add(this.label10);
-            this.tabPage3.Controls.Add(this.label9);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(351, 201);
-            this.tabPage3.TabIndex = 0;
-            this.tabPage3.Text = "Staircase";
-            this.tabPage3.UseVisualStyleBackColor = true;
-            // 
-            // numUpDwnStepClarifyThrshld
-            // 
-            this.numUpDwnStepClarifyThrshld.Enabled = false;
-            this.numUpDwnStepClarifyThrshld.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.numUpDwnStepClarifyThrshld.Location = new System.Drawing.Point(253, 89);
-            this.numUpDwnStepClarifyThrshld.Name = "numUpDwnStepClarifyThrshld";
-            this.numUpDwnStepClarifyThrshld.Size = new System.Drawing.Size(50, 20);
-            this.numUpDwnStepClarifyThrshld.TabIndex = 77;
-            this.numUpDwnStepClarifyThrshld.Value = new decimal(new int[] {
-            20,
+            this.numUpDwnItrtnCount.Location = new System.Drawing.Point(115, 115);
+            this.numUpDwnItrtnCount.Maximum = new decimal(new int[] {
+            100000,
             0,
             0,
             0});
-            // 
-            // numUpDwnStdDevIn3Itrtn
-            // 
-            this.numUpDwnStdDevIn3Itrtn.Location = new System.Drawing.Point(253, 115);
-            this.numUpDwnStdDevIn3Itrtn.Minimum = new decimal(new int[] {
+            this.numUpDwnItrtnCount.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numUpDwnStdDevIn3Itrtn.Name = "numUpDwnStdDevIn3Itrtn";
-            this.numUpDwnStdDevIn3Itrtn.Size = new System.Drawing.Size(50, 20);
-            this.numUpDwnStdDevIn3Itrtn.TabIndex = 76;
-            this.numUpDwnStdDevIn3Itrtn.Value = new decimal(new int[] {
+            this.numUpDwnItrtnCount.Name = "numUpDwnItrtnCount";
+            this.numUpDwnItrtnCount.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnItrtnCount.TabIndex = 78;
+            this.numUpDwnItrtnCount.Value = new decimal(new int[] {
             3,
             0,
             0,
             0});
             // 
-            // numUpDwnTimeStepFreqChng
+            // txtBxDigitsForExclusion
             // 
-            this.numUpDwnTimeStepFreqChng.Location = new System.Drawing.Point(253, 63);
-            this.numUpDwnTimeStepFreqChng.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numUpDwnTimeStepFreqChng.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numUpDwnTimeStepFreqChng.Name = "numUpDwnTimeStepFreqChng";
-            this.numUpDwnTimeStepFreqChng.Size = new System.Drawing.Size(50, 20);
-            this.numUpDwnTimeStepFreqChng.TabIndex = 75;
-            this.numUpDwnTimeStepFreqChng.Value = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
+            this.txtBxDigitsForExclusion.Location = new System.Drawing.Point(9, 60);
+            this.txtBxDigitsForExclusion.Name = "txtBxDigitsForExclusion";
+            this.txtBxDigitsForExclusion.Size = new System.Drawing.Size(322, 20);
+            this.txtBxDigitsForExclusion.TabIndex = 3;
             // 
-            // numUpDwnStepFreqHz
+            // label32
             // 
-            this.numUpDwnStepFreqHz.Location = new System.Drawing.Point(253, 37);
-            this.numUpDwnStepFreqHz.Name = "numUpDwnStepFreqHz";
-            this.numUpDwnStepFreqHz.Size = new System.Drawing.Size(50, 20);
-            this.numUpDwnStepFreqHz.TabIndex = 74;
-            this.numUpDwnStepFreqHz.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            // 
-            // numUpDwnStartingFreq
-            // 
-            this.numUpDwnStartingFreq.Location = new System.Drawing.Point(253, 11);
-            this.numUpDwnStartingFreq.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numUpDwnStartingFreq.Name = "numUpDwnStartingFreq";
-            this.numUpDwnStartingFreq.Size = new System.Drawing.Size(50, 20);
-            this.numUpDwnStartingFreq.TabIndex = 73;
-            this.numUpDwnStartingFreq.Value = new decimal(new int[] {
-            30,
-            0,
-            0,
-            0});
-            // 
-            // numUpDwnBrightness
-            // 
-            this.numUpDwnBrightness.Location = new System.Drawing.Point(253, 141);
-            this.numUpDwnBrightness.Maximum = new decimal(new int[] {
-            255,
-            0,
-            0,
-            0});
-            this.numUpDwnBrightness.Name = "numUpDwnBrightness";
-            this.numUpDwnBrightness.Size = new System.Drawing.Size(50, 20);
-            this.numUpDwnBrightness.TabIndex = 72;
-            this.numUpDwnBrightness.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            // 
-            // label26
-            // 
-            this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(12, 143);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(98, 13);
-            this.label26.TabIndex = 71;
-            this.label26.Text = "Brightness, 0...255:";
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(12, 117);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(242, 13);
-            this.label18.TabIndex = 70;
-            this.label18.Text = "Std Dev of Thresholds in 3 consecutive iterations:";
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(309, 91);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(20, 13);
-            this.label15.TabIndex = 69;
-            this.label15.Text = "Hz";
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(12, 91);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(125, 13);
-            this.label16.TabIndex = 68;
-            this.label16.Text = "Step to Clarify Threshold:";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(309, 65);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(20, 13);
-            this.label13.TabIndex = 67;
-            this.label13.Text = "ms";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(12, 65);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(121, 13);
-            this.label14.TabIndex = 66;
-            this.label14.Text = "Time Step Freq change:";
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(309, 39);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(20, 13);
-            this.label11.TabIndex = 65;
-            this.label11.Text = "Hz";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(12, 39);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(56, 13);
-            this.label12.TabIndex = 64;
-            this.label12.Text = "Step Freq:";
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(309, 13);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(20, 13);
-            this.label10.TabIndex = 63;
-            this.label10.Text = "Hz";
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(12, 13);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(70, 13);
-            this.label9.TabIndex = 62;
-            this.label9.Text = "Starting Freq:";
-            // 
-            // tabPage4
-            // 
-            this.tabPage4.Controls.Add(this.numUpDwnBrightnessSequentialMode);
-            this.tabPage4.Controls.Add(this.label30);
-            this.tabPage4.Controls.Add(this.numUpDwnTrialCount);
-            this.tabPage4.Controls.Add(this.label31);
-            this.tabPage4.Controls.Add(this.numUpDwnTimeStepFreqChngSequentialMode);
-            this.tabPage4.Controls.Add(this.label28);
-            this.tabPage4.Controls.Add(this.label29);
-            this.tabPage4.Controls.Add(this.numUpDwnStartingFreqSequentialMode);
-            this.tabPage4.Controls.Add(this.label25);
-            this.tabPage4.Controls.Add(this.label27);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(351, 201);
-            this.tabPage4.TabIndex = 1;
-            this.tabPage4.Text = "Sequential";
-            this.tabPage4.UseVisualStyleBackColor = true;
-            // 
-            // numUpDwnTimeStepFreqChngSequentialMode
-            // 
-            this.numUpDwnTimeStepFreqChngSequentialMode.Enabled = false;
-            this.numUpDwnTimeStepFreqChngSequentialMode.Location = new System.Drawing.Point(253, 30);
-            this.numUpDwnTimeStepFreqChngSequentialMode.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numUpDwnTimeStepFreqChngSequentialMode.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numUpDwnTimeStepFreqChngSequentialMode.Name = "numUpDwnTimeStepFreqChngSequentialMode";
-            this.numUpDwnTimeStepFreqChngSequentialMode.Size = new System.Drawing.Size(50, 20);
-            this.numUpDwnTimeStepFreqChngSequentialMode.TabIndex = 63;
-            this.numUpDwnTimeStepFreqChngSequentialMode.Value = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            // 
-            // label28
-            // 
-            this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(309, 32);
-            this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(20, 13);
-            this.label28.TabIndex = 62;
-            this.label28.Text = "ms";
-            // 
-            // label29
-            // 
-            this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(12, 32);
-            this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(121, 13);
-            this.label29.TabIndex = 61;
-            this.label29.Text = "Time Step Freq change:";
-            // 
-            // numUpDwnStartingFreqSequentialMode
-            // 
-            this.numUpDwnStartingFreqSequentialMode.Location = new System.Drawing.Point(253, 4);
-            this.numUpDwnStartingFreqSequentialMode.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numUpDwnStartingFreqSequentialMode.Name = "numUpDwnStartingFreqSequentialMode";
-            this.numUpDwnStartingFreqSequentialMode.Size = new System.Drawing.Size(50, 20);
-            this.numUpDwnStartingFreqSequentialMode.TabIndex = 60;
-            this.numUpDwnStartingFreqSequentialMode.Value = new decimal(new int[] {
-            40,
-            0,
-            0,
-            0});
-            // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(309, 6);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(20, 13);
-            this.label25.TabIndex = 59;
-            this.label25.Text = "Hz";
-            // 
-            // label27
-            // 
-            this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(12, 6);
-            this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(70, 13);
-            this.label27.TabIndex = 58;
-            this.label27.Text = "Starting Freq:";
-            // 
-            // grpBxExperimentMode
-            // 
-            this.grpBxExperimentMode.Controls.Add(this.rdoBtnSequential);
-            this.grpBxExperimentMode.Controls.Add(this.rdoBtnStaircase);
-            this.grpBxExperimentMode.Location = new System.Drawing.Point(6, 252);
-            this.grpBxExperimentMode.Name = "grpBxExperimentMode";
-            this.grpBxExperimentMode.Size = new System.Drawing.Size(114, 69);
-            this.grpBxExperimentMode.TabIndex = 4;
-            this.grpBxExperimentMode.TabStop = false;
-            this.grpBxExperimentMode.Text = "ExperimentMode";
-            // 
-            // rdoBtnSequential
-            // 
-            this.rdoBtnSequential.AutoSize = true;
-            this.rdoBtnSequential.Location = new System.Drawing.Point(6, 42);
-            this.rdoBtnSequential.Name = "rdoBtnSequential";
-            this.rdoBtnSequential.Size = new System.Drawing.Size(75, 17);
-            this.rdoBtnSequential.TabIndex = 1;
-            this.rdoBtnSequential.Text = "Sequential";
-            this.rdoBtnSequential.UseVisualStyleBackColor = true;
-            // 
-            // rdoBtnStaircase
-            // 
-            this.rdoBtnStaircase.AutoSize = true;
-            this.rdoBtnStaircase.Checked = true;
-            this.rdoBtnStaircase.Location = new System.Drawing.Point(6, 19);
-            this.rdoBtnStaircase.Name = "rdoBtnStaircase";
-            this.rdoBtnStaircase.Size = new System.Drawing.Size(69, 17);
-            this.rdoBtnStaircase.TabIndex = 0;
-            this.rdoBtnStaircase.TabStop = true;
-            this.rdoBtnStaircase.Text = "Staircase";
-            this.rdoBtnStaircase.UseVisualStyleBackColor = true;
-            // 
-            // numUpDwnTrialCount
-            // 
-            this.numUpDwnTrialCount.Location = new System.Drawing.Point(253, 56);
-            this.numUpDwnTrialCount.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numUpDwnTrialCount.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numUpDwnTrialCount.Name = "numUpDwnTrialCount";
-            this.numUpDwnTrialCount.Size = new System.Drawing.Size(50, 20);
-            this.numUpDwnTrialCount.TabIndex = 66;
-            this.numUpDwnTrialCount.Value = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            // 
-            // label31
-            // 
-            this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(12, 58);
-            this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(60, 13);
-            this.label31.TabIndex = 64;
-            this.label31.Text = "Trial count:";
-            // 
-            // numUpDwnBrightnessSequentialMode
-            // 
-            this.numUpDwnBrightnessSequentialMode.Location = new System.Drawing.Point(253, 82);
-            this.numUpDwnBrightnessSequentialMode.Maximum = new decimal(new int[] {
-            255,
-            0,
-            0,
-            0});
-            this.numUpDwnBrightnessSequentialMode.Name = "numUpDwnBrightnessSequentialMode";
-            this.numUpDwnBrightnessSequentialMode.Size = new System.Drawing.Size(50, 20);
-            this.numUpDwnBrightnessSequentialMode.TabIndex = 74;
-            this.numUpDwnBrightnessSequentialMode.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            // 
-            // label30
-            // 
-            this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(12, 84);
-            this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(98, 13);
-            this.label30.TabIndex = 73;
-            this.label30.Text = "Brightness, 0...255:";
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(8, 39);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(98, 13);
+            this.label32.TabIndex = 63;
+            this.label32.Text = "Digits for exclusion:";
             // 
             // frmMain
             // 
@@ -1125,6 +1186,24 @@ namespace DFlasher
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmMain_KeyDown);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
+            this.grpBxExperimentMode.ResumeLayout(false);
+            this.grpBxExperimentMode.PerformLayout();
+            this.tabControl2.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStepClarifyThrshld)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStdDevIn3Itrtn)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTimeStepFreqChng)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStepFreqHz)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStartingFreq)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnBrightness)).EndInit();
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnBrightnessSequentialMode)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTrialCount)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTimeStepFreqChngSequentialMode)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStartingFreqSequentialMode)).EndInit();
             this.groupBox8.ResumeLayout(false);
             this.groupBox8.PerformLayout();
             this.tabPage2.ResumeLayout(false);
@@ -1138,24 +1217,7 @@ namespace DFlasher
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.groupBox5.ResumeLayout(false);
-            this.tabControl2.ResumeLayout(false);
-            this.tabPage3.ResumeLayout(false);
-            this.tabPage3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStepClarifyThrshld)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStdDevIn3Itrtn)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTimeStepFreqChng)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStepFreqHz)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStartingFreq)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnBrightness)).EndInit();
-            this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTimeStepFreqChngSequentialMode)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStartingFreqSequentialMode)).EndInit();
-            this.grpBxExperimentMode.ResumeLayout(false);
-            this.grpBxExperimentMode.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTrialCount)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnBrightnessSequentialMode)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnItrtnCount)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1247,6 +1309,10 @@ namespace DFlasher
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.NumericUpDown numUpDwnBrightnessSequentialMode;
         private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.CheckBox chckBxNeedRndDigits;
+        private System.Windows.Forms.NumericUpDown numUpDwnItrtnCount;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.TextBox txtBxDigitsForExclusion;
     }
 }
 

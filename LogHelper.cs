@@ -1,24 +1,23 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DFlasher
 {
     internal static class Logger
     {
-        private static BlockingCollection<string> _queue = new BlockingCollection<string>(new ConcurrentQueue<string>());
+        private static BlockingCollection<string> _queue;
         private static Task _task;
         private static string _fileName;
         private static bool _started = false;
         private static readonly object _initLock = new object();
 
-        // Для конвертации QPC→мс относительно старта
-        private static long _pf;       // QueryPerformanceFrequency
-        private static long _startPc;  // QueryPerformanceCounter на старте
+        // QPC -> ms относительно старта
+        private static long _pf;
+        private static long _startPc;
 
         /// <summary>
         /// Инициализация логгера: файл, стартовый тик и частота счетчика.
@@ -28,8 +27,11 @@ namespace DFlasher
         {
             lock (_initLock)
             {
-                if (_started)
-                    return;
+                if (_started) return;
+
+                // КРИТИЧНО: новая очередь на каждую сессию.
+                // Иначе после первого Flush() (CompleteAdding) она "мертвая" навсегда.
+                _queue = new BlockingCollection<string>(new ConcurrentQueue<string>());
 
                 _startPc = startPc;
                 _pf = pf;
@@ -49,7 +51,7 @@ namespace DFlasher
 
                 Directory.CreateDirectory(dir);
 
-                // Если append==false — создаём новое имя с меткой времени
+                // Имя файла
                 if (!append)
                 {
                     string ts = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
@@ -63,12 +65,11 @@ namespace DFlasher
                 bool writeHeader = true;
                 if (append && File.Exists(_fileName))
                 {
-                    // При дозаписи шапку пишем только если файл пуст
                     var fi = new FileInfo(_fileName);
-                    writeHeader = fi.Length == 0;
+                    writeHeader = (fi.Length == 0);
                 }
 
-                _task = Task.Factory.StartNew(delegate
+                _task = Task.Factory.StartNew(() =>
                 {
                     using (var sw = new StreamWriter(_fileName, append, Encoding.UTF8))
                     {
@@ -91,39 +92,42 @@ namespace DFlasher
         /// </summary>
         public static void Flush()
         {
-            if (!_started) return;
-            _queue.CompleteAdding();
-            try { _task.Wait(); } catch { /* игнорируем */ }
-            _started = false;
+            lock (_initLock)
+            {
+                if (!_started) return;
+
+                _queue.CompleteAdding();
+
+                try { _task.Wait(); }
+                catch { /* игнор */ }
+
+                _task = null;
+                _started = false;
+            }
         }
 
         // ================= ПУБЛИЧНЫЕ ЗАПИСИ =================
 
-        /// <summary>
-        /// Универсальная запись: details.
-        /// pcNow — текущее значение QueryPerformanceCounter (фактическое время события!).
-        /// </summary>
         public static void WriteLog(long pcNow, string eventName, string details)
         {
             Enqueue(Format(pcNow, eventName, details));
         }
 
-        // Перегрузки «как у вас», но без DateTime.Now — время берём из pcNow/QPC.
         public static void WriteLog(long pcNow, string action, int errorCode, string errorDescription)
         {
-            string details = "action=" + action + ";code=" + errorCode.ToString() + ";desc=" + errorDescription;
+            string details = "action=" + action + ";code=" + errorCode + ";desc=" + errorDescription;
             Enqueue(Format(pcNow, "event", details));
         }
 
         public static void WriteLog(long pcNow, string action, float code1, float code2, string description)
         {
-            string details = "action=" + action + ";code1=" + code1.ToString() + ";code2=" + code2.ToString() + ";desc=" + description;
+            string details = "action=" + action + ";code1=" + code1 + ";code2=" + code2 + ";desc=" + description;
             Enqueue(Format(pcNow, "event", details));
         }
 
         public static void WriteLog(long pcNow, string action, long code, string description)
         {
-            string details = "action=" + action + ";code=" + code.ToString() + ";desc=" + description;
+            string details = "action=" + action + ";code=" + code + ";desc=" + description;
             Enqueue(Format(pcNow, "event", details));
         }
 
@@ -131,15 +135,22 @@ namespace DFlasher
 
         private static void Enqueue(string line)
         {
-            if (!_started) return; // можно и бросать исключение, но безопаснее молча игнорить до Init
-            if (!_queue.IsAddingCompleted)
+            if (!_started) return;
+
+            // Защита от редкой гонки "Flush() ровно сейчас"
+            try
+            {
                 _queue.Add(line);
+            }
+            catch
+            {
+                // очередь уже закрыта — игнор
+            }
         }
 
         private static string Format(long pcNow, string ev, string details)
         {
             double ms = PcToMs(pcNow);
-            // CSV: миллисекунды с точностью до тысячных
             return ms.ToString("0.###") + ";" + ev + ";" + details;
         }
 
@@ -147,7 +158,7 @@ namespace DFlasher
         {
             if (_pf == 0) return 0.0;
             long delta = pcNow - _startPc;
-            return ((double)delta) * 1000.0 / (double)_pf;
+            return (double)delta * 1000.0 / (double)_pf;
         }
     }
 }

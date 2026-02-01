@@ -104,6 +104,8 @@ namespace DFlasher
         private int CurrentFreq;
         private int CurrentIteration;
         private int CurrentThreshold;
+        private int IteratinsCount;
+        private int NeedRandomDigits;
         private static int NeedSwapDigits;
         private double AvgThreshold = 0;
         private List<double> _allThresholds = new List<double>();
@@ -111,6 +113,7 @@ namespace DFlasher
         private int _sweepDir = -1;          // начнём с понижения
         //private bool _jumpUpNext = true;     // первый скачок — вверх
         private Random _rnd;
+        private HashSet<int> _excludedDigits = null;
 
         // ===== Данные для анализа =====
         private readonly object _lock = new object();
@@ -131,9 +134,8 @@ namespace DFlasher
             Directory.CreateDirectory(Path.GetDirectoryName(configFile));
 
             _ui = SynchronizationContext.Current;
-            _intervalTicks = Pf / 100; // 10 мс
-
             QueryPerformanceFrequency(out Pf);
+            _intervalTicks = Pf / 100; // 10 мс
             QueryPerformanceCounter(out LastPc);
 
             timeBeginPeriod(1);
@@ -146,8 +148,56 @@ namespace DFlasher
 
             InitializeComponent();
 
+            InitRandom();
+
             this.KeyPreview = true;
 
+        }
+        private void PrepareExcludedDigits(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                _excludedDigits = null;
+                return;
+            }
+
+            _excludedDigits = new HashSet<int>();
+
+            char[] sep = new[] { ',', ';', ' ', '\t', '\r', '\n' };
+            var tokens = raw.Split(sep, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var t in tokens)
+            {
+                if (int.TryParse(t.Trim(), out int n))
+                {
+                    if (n >= 10 && n <= 99)
+                        _excludedDigits.Add(n);
+                }
+            }
+
+            // если исключили вообще всё — отключаем исключения
+            if (_excludedDigits.Count >= 90)
+                _excludedDigits = null;
+        }
+        private int GenerateAllowedTwoDigitNumber()
+        {
+            if (_excludedDigits == null)
+                return _rnd.Next(10, 100);
+
+            int n;
+
+            do
+            {
+                n = _rnd.Next(10, 100);
+            }
+            while (_excludedDigits.Contains(n));
+
+            return n;
+        }
+        private void SendRandomDigits()
+        {
+            TwoDigitNumber = GenerateAllowedTwoDigitNumber();//_rnd.Next(10, 100);
+            comm.WriteData(CurrentDigitCmd + ToHardwareDigit(TwoDigitNumber));
         }
         private void TmrCallbckForMainProcessing(int id, int msg, IntPtr user, int dw1, int dw2)
         {
@@ -170,9 +220,7 @@ namespace DFlasher
                                     return;
                                 }
                                 CurrentFreq--;
-                                // новая случайная цифра
-                                TwoDigitNumber = _rnd.Next(10, 100);
-                                comm.WriteData(CurrentDigitCmd + ToHardwareDigit(TwoDigitNumber));
+                                if (NeedRandomDigits == 1) SendRandomDigits();
                             }
                             else
                             {
@@ -195,9 +243,7 @@ namespace DFlasher
                                     return;
                                 }
                                 CurrentFreq++;
-                                // новая случайная цифра
-                                TwoDigitNumber = _rnd.Next(10, 100);
-                                comm.WriteData(CurrentDigitCmd + ToHardwareDigit(TwoDigitNumber));
+                                if (NeedRandomDigits == 1) SendRandomDigits();
                             }
                             else
                             {
@@ -372,10 +418,8 @@ namespace DFlasher
                                 txtBxCurSigma.Text = sigma.ToString("0.###");
                             }, null);
 
-                            int minIters = 3;
-
                             // 0 тоже «хорошо», но нужен минимум итераций
-                            if (CurrentIteration >= minIters && sigma <= Cfg.StdDevIn3Itrtn)
+                            if (CurrentIteration >= IteratinsCount && sigma <= Cfg.StdDevThreshold) 
                             {
                                 // ЛОГ ОТВЕТА БЕЗ ПРЫЖКА
                                 string details = string.Format(
@@ -441,8 +485,7 @@ namespace DFlasher
                                 comm.WriteData(CurrentFreqCmd + CurrentFreq.ToString());
 
                                 // новая случайная цифра
-                                TwoDigitNumber = _rnd.Next(10, 100);
-                                comm.WriteData(CurrentDigitCmd + ToHardwareDigit(TwoDigitNumber));
+                                SendRandomDigits();
 
                                 // новое направление ползания
                                 _sweepDir = -oldDir;
@@ -496,8 +539,8 @@ namespace DFlasher
                             CurrentFreq = newStartFreq;
                             comm.WriteData(CurrentFreqCmd + CurrentFreq.ToString());
 
-                            TwoDigitNumber = _rnd.Next(10, 100);
-                            comm.WriteData(CurrentDigitCmd + ToHardwareDigit(TwoDigitNumber));
+                            //Новая случайная цифра
+                            SendRandomDigits();
 
                             _sweepDir = -oldDir;
                             string workDir = (_sweepDir < 0 ? "down" : "up");
@@ -689,6 +732,7 @@ namespace DFlasher
 
             CurrentFreq = Cfg.StartingFreq;
             NeedSwapDigits = Cfg.NeedSwapDigits;
+            NeedRandomDigits = Cfg.NeedRandomDigits;
 
             LoadComPortValues();
             SetComPortDefaults();
@@ -750,17 +794,23 @@ namespace DFlasher
             numUpDwnStepFreqHz.Value = Cfg.StepJumpFreq;
             numUpDwnTimeStepFreqChng.Value = Cfg.TimeStepFreqChngMs;
             numUpDwnStepClarifyThrshld.Value = Cfg.StepClarifyThrshldHz;
-            numUpDwnStdDevIn3Itrtn.Value = Cfg.StdDevIn3Itrtn;
+            numUpDwnStdDevIn3Itrtn.Value = Cfg.StdDevThreshold;
             numUpDwnBrightness.Value = Cfg.Brightness;
+
+            numUpDwnItrtnCount.Value = Cfg.IteratinsCount;
 
             // Режим эксперимента
             rdoBtnStaircase.Checked = (Cfg.Mode == ExperimentMode.Staircase);
             rdoBtnSequential.Checked = (Cfg.Mode == ExperimentMode.Sequential);
 
+            chckBxNeedRndDigits.Checked = Convert.ToBoolean(Cfg.NeedRandomDigits);
+
             // Sequential настройки (только нужные)
             numUpDwnStartingFreqSequentialMode.Value = Cfg.SequentialStartingFreq;
             numUpDwnTrialCount.Value = Cfg.SequentialTrials;
             numUpDwnBrightnessSequentialMode.Value = Cfg.SequentialBrightness;
+
+            txtBxDigitsForExclusion.Text = Cfg.DigitsForExclusion;
         }
 
         private void GetControlsStates()
@@ -774,12 +824,17 @@ namespace DFlasher
             Cfg.StepJumpFreq = (int)numUpDwnStepFreqHz.Value;
             Cfg.TimeStepFreqChngMs = (int)numUpDwnTimeStepFreqChng.Value;
             Cfg.StepClarifyThrshldHz = (int)numUpDwnStepClarifyThrshld.Value;
-            Cfg.StdDevIn3Itrtn = (int)numUpDwnStdDevIn3Itrtn.Value;
+            Cfg.StdDevThreshold = (int)numUpDwnStdDevIn3Itrtn.Value;
             Cfg.Brightness = (int)numUpDwnBrightness.Value;
+            Cfg.IteratinsCount = (int)numUpDwnItrtnCount.Value;
             // Sequential настройки
             Cfg.SequentialStartingFreq = (int)numUpDwnStartingFreqSequentialMode.Value;
             Cfg.SequentialTrials = (int)numUpDwnTrialCount.Value;
             Cfg.SequentialBrightness = (int)numUpDwnBrightnessSequentialMode.Value;
+
+            Cfg.NeedRandomDigits = Convert.ToInt32(chckBxNeedRndDigits.Checked);
+
+            Cfg.DigitsForExclusion = txtBxDigitsForExclusion.Text.Trim();
         }
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -946,6 +1001,9 @@ namespace DFlasher
                 return;
             }
 
+            WrkState = WS.wsStoped;
+            Thread.Sleep(5);   // дать таймеру выйти из callback
+
             // Если предыдущая сессия была, закрываем лог перед новым стартом
             Logger.Flush();
 
@@ -953,8 +1011,14 @@ namespace DFlasher
 
             Brightness = Cfg.Brightness;
 
+            IteratinsCount = Cfg.IteratinsCount;
+            NeedRandomDigits = Cfg.NeedRandomDigits;
+
+            PrepareExcludedDigits(Cfg.DigitsForExclusion);
+
             InitRandom();
-            TwoDigitNumber = _rnd.Next(10, 100); // целевая цифра 
+
+            SendRandomDigits();// целевая цифра 
 
             int startFreq = Cfg.StartingFreq;
 
@@ -980,8 +1044,10 @@ namespace DFlasher
             // Логгер — новый файл на каждый старт (append = false)
             string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", "exp_log.csv");
             Logger.Init(logPath, StartPc, Pf, false);
+
             Logger.WriteLog(StartPc, "session_start",
-                $"startFreq={startFreq};stepHz={Cfg.StepJumpFreq};stepTime={Cfg.TimeStepFreqChngMs};target={TwoDigitNumber}");
+                $"startFreq={startFreq};stepHz={Cfg.StepJumpFreq};stepTime={Cfg.TimeStepFreqChngMs};" +
+                $"target={TwoDigitNumber};minIters={IteratinsCount};sigmaMax={Cfg.StdDevThreshold:0.###};randDigits={NeedRandomDigits}");
 
             // <<< УБРАНО: не пишем фейковый jump в t=0, он всё только путает
             // Logger.WriteLog(StartPc, "jump",
@@ -1037,14 +1103,10 @@ namespace DFlasher
 
             // Зафиксируем текущее состояние
             QueryPerformanceCounter(out long pcNow);
- //           Logger.WriteLog(pcNow, "session_stop", $"reason=manual;freq={CurrentFreq}");
             Logger.WriteLog(pcNow, "session_stop", $"reason=manual;freq={CurrentFreq} target_final= {TwoDigitNumber}");
-
 
             // Вернуть стимуляцию к начальному значению (если так задумано)
             comm.WriteData(CurrentFreqCmd + Cfg.StartingFreq.ToString());
-                        Logger.WriteLog(pcNow, "session_stop", $"reason=manual;freq={CurrentFreq} target_final= {TwoDigitNumber}");
-
 
             Logger.Flush();
 

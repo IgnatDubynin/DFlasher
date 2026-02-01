@@ -19,7 +19,7 @@ namespace DFlasher
         public int StepJumpFreq { get; set; } = 5;
         public int TimeStepFreqChngMs { get; set; } = 1000;
         public int StepClarifyThrshldHz { get; set; } = 20;
-        public int StdDevIn3Itrtn { get; set; } = 3;
+        public int StdDevThreshold { get; set; } = 3;
 
         public int Brightness { get; set; } = 2;
 
@@ -32,7 +32,9 @@ namespace DFlasher
         public int SequentialBrightness { get; set; } = 2;
         public int SequentialDirection { get; set; } = -1; // -1 = вниз, +1 = вверх (пока без UI)
         public int NeedSwapDigits { get; set; } = 0; //для старого макета надо переставлять цифры (0), для нового нет (1)
-
+        public int NeedRandomDigits { get; set; } = 1;//надо ли генерировать новую пару цифр при каждом изменении частоты
+        public int IteratinsCount { get; set; } = 3;//количество итераций
+        public string DigitsForExclusion { get; set; } = "";//список чисел, которые нельзя генерировать при показе
 
         public static Configuration Load(string fileName)
         {

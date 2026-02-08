@@ -38,8 +38,8 @@ namespace DFlasher
             this.chckBxNeedRndDigits = new System.Windows.Forms.CheckBox();
             this.rdoBtnSequential = new System.Windows.Forms.RadioButton();
             this.rdoBtnStaircase = new System.Windows.Forms.RadioButton();
-            this.tabControl2 = new System.Windows.Forms.TabControl();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tabCtrlStimulusSettings = new System.Windows.Forms.TabControl();
+            this.tabStaircase = new System.Windows.Forms.TabPage();
             this.numUpDwnItrtnCount = new System.Windows.Forms.NumericUpDown();
             this.numUpDwnStepClarifyThrshld = new System.Windows.Forms.NumericUpDown();
             this.numUpDwnStdDevIn3Itrtn = new System.Windows.Forms.NumericUpDown();
@@ -57,7 +57,7 @@ namespace DFlasher
             this.label12 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.tabSequential = new System.Windows.Forms.TabPage();
             this.numUpDwnBrightnessSequentialMode = new System.Windows.Forms.NumericUpDown();
             this.label30 = new System.Windows.Forms.Label();
             this.numUpDwnTrialCount = new System.Windows.Forms.NumericUpDown();
@@ -124,12 +124,14 @@ namespace DFlasher
             this.btnAddStim = new System.Windows.Forms.Button();
             this.btnLoadListStimulus = new System.Windows.Forms.Button();
             this.btnSaveListStimulus = new System.Windows.Forms.Button();
+            this.numUpDwnStimulusDigit = new System.Windows.Forms.NumericUpDown();
+            this.label33 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.grpBxExperimentMode.SuspendLayout();
-            this.tabControl2.SuspendLayout();
-            this.tabPage3.SuspendLayout();
+            this.tabCtrlStimulusSettings.SuspendLayout();
+            this.tabStaircase.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnItrtnCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStepClarifyThrshld)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStdDevIn3Itrtn)).BeginInit();
@@ -137,7 +139,7 @@ namespace DFlasher
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStepFreqHz)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStartingFreq)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnBrightness)).BeginInit();
-            this.tabPage4.SuspendLayout();
+            this.tabSequential.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnBrightnessSequentialMode)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTrialCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTimeStepFreqChngSequentialMode)).BeginInit();
@@ -150,6 +152,7 @@ namespace DFlasher
             this.GroupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStimulusDigit)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -177,10 +180,10 @@ namespace DFlasher
             // 
             // groupBox5
             // 
-            this.groupBox5.Controls.Add(this.tabControl2);
+            this.groupBox5.Controls.Add(this.tabCtrlStimulusSettings);
             this.groupBox5.Location = new System.Drawing.Point(6, 9);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(533, 432);
+            this.groupBox5.Size = new System.Drawing.Size(533, 471);
             this.groupBox5.TabIndex = 4;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "ExpSettings";
@@ -192,9 +195,9 @@ namespace DFlasher
             this.grpBxExperimentMode.Controls.Add(this.chckBxNeedRndDigits);
             this.grpBxExperimentMode.Controls.Add(this.rdoBtnSequential);
             this.grpBxExperimentMode.Controls.Add(this.rdoBtnStaircase);
-            this.grpBxExperimentMode.Location = new System.Drawing.Point(6, 447);
+            this.grpBxExperimentMode.Location = new System.Drawing.Point(6, 486);
             this.grpBxExperimentMode.Name = "grpBxExperimentMode";
-            this.grpBxExperimentMode.Size = new System.Drawing.Size(353, 143);
+            this.grpBxExperimentMode.Size = new System.Drawing.Size(337, 104);
             this.grpBxExperimentMode.TabIndex = 4;
             this.grpBxExperimentMode.TabStop = false;
             this.grpBxExperimentMode.Text = "ExperimentMode";
@@ -202,7 +205,7 @@ namespace DFlasher
             // label32
             // 
             this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(8, 39);
+            this.label32.Location = new System.Drawing.Point(6, 39);
             this.label32.Name = "label32";
             this.label32.Size = new System.Drawing.Size(98, 13);
             this.label32.TabIndex = 63;
@@ -210,7 +213,7 @@ namespace DFlasher
             // 
             // txtBxDigitsForExclusion
             // 
-            this.txtBxDigitsForExclusion.Location = new System.Drawing.Point(9, 60);
+            this.txtBxDigitsForExclusion.Location = new System.Drawing.Point(6, 55);
             this.txtBxDigitsForExclusion.Name = "txtBxDigitsForExclusion";
             this.txtBxDigitsForExclusion.Size = new System.Drawing.Size(322, 20);
             this.txtBxDigitsForExclusion.TabIndex = 3;
@@ -220,7 +223,7 @@ namespace DFlasher
             this.chckBxNeedRndDigits.AutoSize = true;
             this.chckBxNeedRndDigits.Checked = true;
             this.chckBxNeedRndDigits.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chckBxNeedRndDigits.Location = new System.Drawing.Point(9, 19);
+            this.chckBxNeedRndDigits.Location = new System.Drawing.Point(6, 19);
             this.chckBxNeedRndDigits.Name = "chckBxNeedRndDigits";
             this.chckBxNeedRndDigits.Size = new System.Drawing.Size(124, 17);
             this.chckBxNeedRndDigits.TabIndex = 2;
@@ -230,7 +233,7 @@ namespace DFlasher
             // rdoBtnSequential
             // 
             this.rdoBtnSequential.AutoSize = true;
-            this.rdoBtnSequential.Location = new System.Drawing.Point(9, 109);
+            this.rdoBtnSequential.Location = new System.Drawing.Point(81, 81);
             this.rdoBtnSequential.Name = "rdoBtnSequential";
             this.rdoBtnSequential.Size = new System.Drawing.Size(75, 17);
             this.rdoBtnSequential.TabIndex = 1;
@@ -241,7 +244,7 @@ namespace DFlasher
             // 
             this.rdoBtnStaircase.AutoSize = true;
             this.rdoBtnStaircase.Checked = true;
-            this.rdoBtnStaircase.Location = new System.Drawing.Point(9, 86);
+            this.rdoBtnStaircase.Location = new System.Drawing.Point(6, 81);
             this.rdoBtnStaircase.Name = "rdoBtnStaircase";
             this.rdoBtnStaircase.Size = new System.Drawing.Size(69, 17);
             this.rdoBtnStaircase.TabIndex = 0;
@@ -249,42 +252,42 @@ namespace DFlasher
             this.rdoBtnStaircase.Text = "Staircase";
             this.rdoBtnStaircase.UseVisualStyleBackColor = true;
             // 
-            // tabControl2
+            // tabCtrlStimulusSettings
             // 
-            this.tabControl2.Controls.Add(this.tabPage3);
-            this.tabControl2.Controls.Add(this.tabPage4);
-            this.tabControl2.Location = new System.Drawing.Point(4, 19);
-            this.tabControl2.Name = "tabControl2";
-            this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(523, 407);
-            this.tabControl2.TabIndex = 3;
+            this.tabCtrlStimulusSettings.Controls.Add(this.tabStaircase);
+            this.tabCtrlStimulusSettings.Controls.Add(this.tabSequential);
+            this.tabCtrlStimulusSettings.Location = new System.Drawing.Point(4, 19);
+            this.tabCtrlStimulusSettings.Name = "tabCtrlStimulusSettings";
+            this.tabCtrlStimulusSettings.SelectedIndex = 0;
+            this.tabCtrlStimulusSettings.Size = new System.Drawing.Size(529, 446);
+            this.tabCtrlStimulusSettings.TabIndex = 3;
             // 
-            // tabPage3
+            // tabStaircase
             // 
-            this.tabPage3.Controls.Add(this.numUpDwnItrtnCount);
-            this.tabPage3.Controls.Add(this.numUpDwnStepClarifyThrshld);
-            this.tabPage3.Controls.Add(this.numUpDwnStdDevIn3Itrtn);
-            this.tabPage3.Controls.Add(this.numUpDwnTimeStepFreqChng);
-            this.tabPage3.Controls.Add(this.numUpDwnStepFreqHz);
-            this.tabPage3.Controls.Add(this.numUpDwnStartingFreq);
-            this.tabPage3.Controls.Add(this.numUpDwnBrightness);
-            this.tabPage3.Controls.Add(this.label26);
-            this.tabPage3.Controls.Add(this.label18);
-            this.tabPage3.Controls.Add(this.label15);
-            this.tabPage3.Controls.Add(this.label16);
-            this.tabPage3.Controls.Add(this.label13);
-            this.tabPage3.Controls.Add(this.label14);
-            this.tabPage3.Controls.Add(this.label11);
-            this.tabPage3.Controls.Add(this.label12);
-            this.tabPage3.Controls.Add(this.label10);
-            this.tabPage3.Controls.Add(this.label9);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(515, 381);
-            this.tabPage3.TabIndex = 0;
-            this.tabPage3.Text = "Staircase";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.tabStaircase.Controls.Add(this.numUpDwnItrtnCount);
+            this.tabStaircase.Controls.Add(this.numUpDwnStepClarifyThrshld);
+            this.tabStaircase.Controls.Add(this.numUpDwnStdDevIn3Itrtn);
+            this.tabStaircase.Controls.Add(this.numUpDwnTimeStepFreqChng);
+            this.tabStaircase.Controls.Add(this.numUpDwnStepFreqHz);
+            this.tabStaircase.Controls.Add(this.numUpDwnStartingFreq);
+            this.tabStaircase.Controls.Add(this.numUpDwnBrightness);
+            this.tabStaircase.Controls.Add(this.label26);
+            this.tabStaircase.Controls.Add(this.label18);
+            this.tabStaircase.Controls.Add(this.label15);
+            this.tabStaircase.Controls.Add(this.label16);
+            this.tabStaircase.Controls.Add(this.label13);
+            this.tabStaircase.Controls.Add(this.label14);
+            this.tabStaircase.Controls.Add(this.label11);
+            this.tabStaircase.Controls.Add(this.label12);
+            this.tabStaircase.Controls.Add(this.label10);
+            this.tabStaircase.Controls.Add(this.label9);
+            this.tabStaircase.Location = new System.Drawing.Point(4, 22);
+            this.tabStaircase.Name = "tabStaircase";
+            this.tabStaircase.Padding = new System.Windows.Forms.Padding(3);
+            this.tabStaircase.Size = new System.Drawing.Size(521, 420);
+            this.tabStaircase.TabIndex = 0;
+            this.tabStaircase.Text = "Staircase";
+            this.tabStaircase.UseVisualStyleBackColor = true;
             // 
             // numUpDwnItrtnCount
             // 
@@ -497,35 +500,37 @@ namespace DFlasher
             this.label9.TabIndex = 62;
             this.label9.Text = "Starting Freq:";
             // 
-            // tabPage4
+            // tabSequential
             // 
-            this.tabPage4.Controls.Add(this.btnSaveListStimulus);
-            this.tabPage4.Controls.Add(this.btnLoadListStimulus);
-            this.tabPage4.Controls.Add(this.btnClearStim);
-            this.tabPage4.Controls.Add(this.btnRemoveStim);
-            this.tabPage4.Controls.Add(this.btnAddStim);
-            this.tabPage4.Controls.Add(this.lstBxStimWorkSequence);
-            this.tabPage4.Controls.Add(this.numUpDwnBrightnessSequentialMode);
-            this.tabPage4.Controls.Add(this.label30);
-            this.tabPage4.Controls.Add(this.numUpDwnTrialCount);
-            this.tabPage4.Controls.Add(this.label31);
-            this.tabPage4.Controls.Add(this.numUpDwnTimeStepFreqChngSequentialMode);
-            this.tabPage4.Controls.Add(this.label28);
-            this.tabPage4.Controls.Add(this.label29);
-            this.tabPage4.Controls.Add(this.numUpDwnStartingFreqSequentialMode);
-            this.tabPage4.Controls.Add(this.label25);
-            this.tabPage4.Controls.Add(this.label27);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(515, 381);
-            this.tabPage4.TabIndex = 1;
-            this.tabPage4.Text = "Sequential";
-            this.tabPage4.UseVisualStyleBackColor = true;
+            this.tabSequential.Controls.Add(this.numUpDwnStimulusDigit);
+            this.tabSequential.Controls.Add(this.label33);
+            this.tabSequential.Controls.Add(this.btnSaveListStimulus);
+            this.tabSequential.Controls.Add(this.btnLoadListStimulus);
+            this.tabSequential.Controls.Add(this.btnClearStim);
+            this.tabSequential.Controls.Add(this.btnRemoveStim);
+            this.tabSequential.Controls.Add(this.btnAddStim);
+            this.tabSequential.Controls.Add(this.lstBxStimWorkSequence);
+            this.tabSequential.Controls.Add(this.numUpDwnBrightnessSequentialMode);
+            this.tabSequential.Controls.Add(this.label30);
+            this.tabSequential.Controls.Add(this.numUpDwnTrialCount);
+            this.tabSequential.Controls.Add(this.label31);
+            this.tabSequential.Controls.Add(this.numUpDwnTimeStepFreqChngSequentialMode);
+            this.tabSequential.Controls.Add(this.label28);
+            this.tabSequential.Controls.Add(this.label29);
+            this.tabSequential.Controls.Add(this.numUpDwnStartingFreqSequentialMode);
+            this.tabSequential.Controls.Add(this.label25);
+            this.tabSequential.Controls.Add(this.label27);
+            this.tabSequential.Location = new System.Drawing.Point(4, 22);
+            this.tabSequential.Name = "tabSequential";
+            this.tabSequential.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSequential.Size = new System.Drawing.Size(521, 420);
+            this.tabSequential.TabIndex = 1;
+            this.tabSequential.Text = "Sequential";
+            this.tabSequential.UseVisualStyleBackColor = true;
             // 
             // numUpDwnBrightnessSequentialMode
             // 
-            this.numUpDwnBrightnessSequentialMode.Location = new System.Drawing.Point(253, 82);
+            this.numUpDwnBrightnessSequentialMode.Location = new System.Drawing.Point(250, 134);
             this.numUpDwnBrightnessSequentialMode.Maximum = new decimal(new int[] {
             255,
             0,
@@ -539,11 +544,12 @@ namespace DFlasher
             0,
             0,
             0});
+            this.numUpDwnBrightnessSequentialMode.ValueChanged += new System.EventHandler(this.numUpDwnBrightnessSequentialMode_ValueChanged);
             // 
             // label30
             // 
             this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(12, 84);
+            this.label30.Location = new System.Drawing.Point(9, 136);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(98, 13);
             this.label30.TabIndex = 73;
@@ -551,14 +557,9 @@ namespace DFlasher
             // 
             // numUpDwnTrialCount
             // 
-            this.numUpDwnTrialCount.Location = new System.Drawing.Point(253, 56);
+            this.numUpDwnTrialCount.Location = new System.Drawing.Point(250, 108);
             this.numUpDwnTrialCount.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numUpDwnTrialCount.Minimum = new decimal(new int[] {
-            1,
+            10000000,
             0,
             0,
             0});
@@ -574,17 +575,17 @@ namespace DFlasher
             // label31
             // 
             this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(12, 58);
+            this.label31.Location = new System.Drawing.Point(9, 110);
             this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(60, 13);
+            this.label31.Size = new System.Drawing.Size(79, 13);
             this.label31.TabIndex = 64;
-            this.label31.Text = "Trial count:";
+            this.label31.Text = "Stimulus count:";
             // 
             // numUpDwnTimeStepFreqChngSequentialMode
             // 
-            this.numUpDwnTimeStepFreqChngSequentialMode.Location = new System.Drawing.Point(253, 30);
+            this.numUpDwnTimeStepFreqChngSequentialMode.Location = new System.Drawing.Point(250, 82);
             this.numUpDwnTimeStepFreqChngSequentialMode.Maximum = new decimal(new int[] {
-            10000,
+            1000000,
             0,
             0,
             0});
@@ -606,7 +607,7 @@ namespace DFlasher
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(309, 32);
+            this.label28.Location = new System.Drawing.Point(306, 84);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(20, 13);
             this.label28.TabIndex = 62;
@@ -615,7 +616,7 @@ namespace DFlasher
             // label29
             // 
             this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(12, 32);
+            this.label29.Location = new System.Drawing.Point(9, 84);
             this.label29.Name = "label29";
             this.label29.Size = new System.Drawing.Size(90, 13);
             this.label29.TabIndex = 61;
@@ -623,7 +624,12 @@ namespace DFlasher
             // 
             // numUpDwnStartingFreqSequentialMode
             // 
-            this.numUpDwnStartingFreqSequentialMode.Location = new System.Drawing.Point(253, 4);
+            this.numUpDwnStartingFreqSequentialMode.Location = new System.Drawing.Point(250, 56);
+            this.numUpDwnStartingFreqSequentialMode.Maximum = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
             this.numUpDwnStartingFreqSequentialMode.Minimum = new decimal(new int[] {
             1,
             0,
@@ -642,7 +648,7 @@ namespace DFlasher
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(309, 6);
+            this.label25.Location = new System.Drawing.Point(306, 58);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(20, 13);
             this.label25.TabIndex = 59;
@@ -651,7 +657,7 @@ namespace DFlasher
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(12, 6);
+            this.label27.Location = new System.Drawing.Point(9, 58);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(73, 13);
             this.label27.TabIndex = 58;
@@ -1181,7 +1187,7 @@ namespace DFlasher
             // lstBxStimWorkSequence
             // 
             this.lstBxStimWorkSequence.FormattingEnabled = true;
-            this.lstBxStimWorkSequence.Location = new System.Drawing.Point(15, 119);
+            this.lstBxStimWorkSequence.Location = new System.Drawing.Point(6, 163);
             this.lstBxStimWorkSequence.Name = "lstBxStimWorkSequence";
             this.lstBxStimWorkSequence.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lstBxStimWorkSequence.Size = new System.Drawing.Size(277, 251);
@@ -1190,7 +1196,7 @@ namespace DFlasher
             // 
             // btnClearStim
             // 
-            this.btnClearStim.Location = new System.Drawing.Point(312, 177);
+            this.btnClearStim.Location = new System.Drawing.Point(312, 262);
             this.btnClearStim.Name = "btnClearStim";
             this.btnClearStim.Size = new System.Drawing.Size(98, 23);
             this.btnClearStim.TabIndex = 83;
@@ -1200,7 +1206,7 @@ namespace DFlasher
             // 
             // btnRemoveStim
             // 
-            this.btnRemoveStim.Location = new System.Drawing.Point(312, 148);
+            this.btnRemoveStim.Location = new System.Drawing.Point(312, 233);
             this.btnRemoveStim.Name = "btnRemoveStim";
             this.btnRemoveStim.Size = new System.Drawing.Size(98, 23);
             this.btnRemoveStim.TabIndex = 82;
@@ -1210,7 +1216,7 @@ namespace DFlasher
             // 
             // btnAddStim
             // 
-            this.btnAddStim.Location = new System.Drawing.Point(312, 119);
+            this.btnAddStim.Location = new System.Drawing.Point(312, 204);
             this.btnAddStim.Name = "btnAddStim";
             this.btnAddStim.Size = new System.Drawing.Size(98, 23);
             this.btnAddStim.TabIndex = 81;
@@ -1220,7 +1226,7 @@ namespace DFlasher
             // 
             // btnLoadListStimulus
             // 
-            this.btnLoadListStimulus.Location = new System.Drawing.Point(312, 225);
+            this.btnLoadListStimulus.Location = new System.Drawing.Point(312, 310);
             this.btnLoadListStimulus.Name = "btnLoadListStimulus";
             this.btnLoadListStimulus.Size = new System.Drawing.Size(98, 23);
             this.btnLoadListStimulus.TabIndex = 84;
@@ -1230,13 +1236,45 @@ namespace DFlasher
             // 
             // btnSaveListStimulus
             // 
-            this.btnSaveListStimulus.Location = new System.Drawing.Point(312, 254);
+            this.btnSaveListStimulus.Location = new System.Drawing.Point(312, 339);
             this.btnSaveListStimulus.Name = "btnSaveListStimulus";
             this.btnSaveListStimulus.Size = new System.Drawing.Size(98, 23);
             this.btnSaveListStimulus.TabIndex = 85;
             this.btnSaveListStimulus.Text = "Save list stimulus";
             this.btnSaveListStimulus.UseVisualStyleBackColor = true;
             this.btnSaveListStimulus.Click += new System.EventHandler(this.btnSaveListStimulus_Click);
+            // 
+            // numUpDwnStimulusDigit
+            // 
+            this.numUpDwnStimulusDigit.Location = new System.Drawing.Point(250, 29);
+            this.numUpDwnStimulusDigit.Maximum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            0});
+            this.numUpDwnStimulusDigit.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numUpDwnStimulusDigit.Name = "numUpDwnStimulusDigit";
+            this.numUpDwnStimulusDigit.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnStimulusDigit.TabIndex = 87;
+            this.numUpDwnStimulusDigit.Value = new decimal(new int[] {
+            40,
+            0,
+            0,
+            0});
+            this.numUpDwnStimulusDigit.ValueChanged += new System.EventHandler(this.numUpDwnStimulusDigit_ValueChanged);
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(9, 31);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(73, 13);
+            this.label33.TabIndex = 86;
+            this.label33.Text = "Stimulus Digit:";
             // 
             // frmMain
             // 
@@ -1260,9 +1298,9 @@ namespace DFlasher
             this.groupBox5.ResumeLayout(false);
             this.grpBxExperimentMode.ResumeLayout(false);
             this.grpBxExperimentMode.PerformLayout();
-            this.tabControl2.ResumeLayout(false);
-            this.tabPage3.ResumeLayout(false);
-            this.tabPage3.PerformLayout();
+            this.tabCtrlStimulusSettings.ResumeLayout(false);
+            this.tabStaircase.ResumeLayout(false);
+            this.tabStaircase.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnItrtnCount)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStepClarifyThrshld)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStdDevIn3Itrtn)).EndInit();
@@ -1270,8 +1308,8 @@ namespace DFlasher
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStepFreqHz)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStartingFreq)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnBrightness)).EndInit();
-            this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
+            this.tabSequential.ResumeLayout(false);
+            this.tabSequential.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnBrightnessSequentialMode)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTrialCount)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTimeStepFreqChngSequentialMode)).EndInit();
@@ -1289,6 +1327,7 @@ namespace DFlasher
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStimulusDigit)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1351,8 +1390,8 @@ namespace DFlasher
         private System.Windows.Forms.GroupBox grpBxExperimentMode;
         private System.Windows.Forms.RadioButton rdoBtnSequential;
         private System.Windows.Forms.RadioButton rdoBtnStaircase;
-        private System.Windows.Forms.TabControl tabControl2;
-        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.TabControl tabCtrlStimulusSettings;
+        private System.Windows.Forms.TabPage tabStaircase;
         private System.Windows.Forms.NumericUpDown numUpDwnStepClarifyThrshld;
         private System.Windows.Forms.NumericUpDown numUpDwnStdDevIn3Itrtn;
         private System.Windows.Forms.NumericUpDown numUpDwnTimeStepFreqChng;
@@ -1369,7 +1408,7 @@ namespace DFlasher
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TabPage tabSequential;
         private System.Windows.Forms.NumericUpDown numUpDwnTrialCount;
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.NumericUpDown numUpDwnTimeStepFreqChngSequentialMode;
@@ -1390,6 +1429,8 @@ namespace DFlasher
         private System.Windows.Forms.ListBox lstBxStimWorkSequence;
         private System.Windows.Forms.Button btnSaveListStimulus;
         private System.Windows.Forms.Button btnLoadListStimulus;
+        private System.Windows.Forms.NumericUpDown numUpDwnStimulusDigit;
+        private System.Windows.Forms.Label label33;
     }
 }
 

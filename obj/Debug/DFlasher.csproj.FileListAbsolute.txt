@@ -182,3 +182,4 @@ D:\Sirius\CogLab\DigitalFlasherGit\DFlasher\bin\Debug\System.ValueTuple.xml
 D:\Sirius\CogLab\DigitalFlasherGit\DFlasher\obj\Debug\DFlasher.csproj.CopyComplete
 D:\Sirius\CogLab\DigitalFlasherGit\DFlasher\obj\Debug\DFlasher.exe
 D:\Sirius\CogLab\DigitalFlasherGit\DFlasher\obj\Debug\DFlasher.pdb
+D:\Sirius\CogLab\DigitalFlasherGit\DFlasher\obj\Debug\DFlasher.csproj.AssemblyReference.cache

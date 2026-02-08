@@ -156,6 +156,9 @@ namespace DFlasher
 
             InitializeComponent();
 
+            lstBxStimWorkSequence.DrawMode = DrawMode.OwnerDrawFixed;
+            lstBxStimWorkSequence.DrawItem += lstBxStimWorkSequence_DrawItem;
+
             _ui = SynchronizationContext.Current; // 
 
             _sessionRunning = false;
@@ -165,7 +168,7 @@ namespace DFlasher
             InitRandom();
 
             this.KeyPreview = true;
-            tabControl2.SelectedTab = tabPage4;
+            tabCtrlStimulusSettings.SelectedTab = tabSequential;
 
         }
         private void PrepareExcludedDigits(string raw)
@@ -275,21 +278,24 @@ namespace DFlasher
 
             var next = Cfg.Stimulus[_seqIndex];
 
+            comm.WriteData(CurrentDigitCmd + ToHardwareDigit(next.Digits));
+            comm.WriteData(CurrentFreqCmd + next.Frequency);
+            CurrentFreq = next.Frequency;
+
             QueryPerformanceCounter(out _seqStimulusStartPc);
+
+            _ui.Post(_ =>
+            {
+                txtBxCurItertn.Text = (_seqIndex + 1).ToString();
+                lstBxStimWorkSequence.SelectedIndex = -1;
+                lstBxStimWorkSequence.SelectedIndex = _seqIndex;
+                lstBxStimWorkSequence.Invalidate();
+            }, null);
 
             _seqState = TPresentationState.Presenting;
             _seqInputStarted = false;
             _seqFirstKeyPc = 0;
             _digitBuf.Clear();
-
-            comm.WriteData(CurrentDigitCmd + ToHardwareDigit(next.Digits));
-            comm.WriteData(CurrentFreqCmd + next.Frequency);
-            CurrentFreq = next.Frequency;
-
-            _ui.Post(_ =>
-            {
-                txtBxCurItertn.Text = (_seqIndex + 1).ToString();
-            }, null);
 
             Logger.WriteLog(_seqStimulusStartPc,
                 "stimulus_start",
@@ -369,81 +375,6 @@ namespace DFlasher
                 UpdateExpTime(Pc);
             }
         }
-        /*        private void TmrCallbckForMainProcessing(int id, int msg, IntPtr user, int dw1, int dw2)
-                {
-                    if (Cfg.Mode == ExperimentMode.Sequential)
-                    {
-                        ProcessSequentialTimer();
-
-                        // можно обновлять время сессии общим StartPc
-                        QueryPerformanceCounter(out Pc);
-                        if (Pc >= LastPc + _intervalTicks)
-                        {
-                            double elapsedSeconds = (double)(Pc - StartPc) / Pf;
-                            string formatted = TimeSpan.FromSeconds(elapsedSeconds).ToString(@"hh\:mm\:ss\.fff");
-                            _ui.Post(_ => txtBxExpTime.Text = formatted, null);
-                            LastPc = Pc;
-                        }
-                        return;
-                    }
-
-                    // ===== Staircase как было =====
-                    if (WrkState != WS.wsStoped)
-                    {
-                        QueryPerformanceCounter(out Pc);
-
-                        if (WrkState == WS.wsFreqSearch)
-                        {
-                            if (Pc >= LastPc2 + StepTimeInTicks)
-                            {
-                                if (_sweepDir < 0)
-                                {
-                                    if (CurrentFreq > MinFreqHz)
-                                    {
-                                        if (!comm.WriteData(DecCurrentFreqCmd))
-                                        {
-                                            SafeStopExperiment("Потеря связи с устройством");
-                                            return;
-                                        }
-                                        CurrentFreq--;
-                                        if (NeedRandomDigits == 1) SendRandomDigits();
-                                    }
-                                    else
-                                    {
-                                        if (_SndPlayer != null) _SndPlayer.StopAll();
-                                    }
-                                }
-                                else
-                                {
-                                    if (CurrentFreq < Cfg.StartingFreq)
-                                    {
-                                        if (!comm.WriteData(IncCurrentFreqCmd))
-                                        {
-                                            SafeStopExperiment("Потеря связи с устройством");
-                                            return;
-                                        }
-                                        CurrentFreq++;
-                                        if (NeedRandomDigits == 1) SendRandomDigits();
-                                    }
-                                    else
-                                    {
-                                        if (_SndPlayer != null) _SndPlayer.StopAll();
-                                    }
-                                }
-
-                                LastPc2 = Pc;
-                            }
-                        }
-
-                        if (Pc >= LastPc + _intervalTicks)
-                        {
-                            double elapsedSeconds = (double)(Pc - StartPc) / Pf;
-                            string formatted = TimeSpan.FromSeconds(elapsedSeconds).ToString(@"hh\:mm\:ss\.fff");
-                            _ui.Post(_ => txtBxExpTime.Text = formatted, null);
-                            LastPc = Pc;
-                        }
-                    }
-                }*/
         private void SafeStopExperiment(string reason)
         {        
             // Сохраняем состояние
@@ -465,6 +396,7 @@ namespace DFlasher
             {
                 btnStart.Enabled = true;
                 btnStop.Enabled = false;
+                lstBxStimWorkSequence.Enabled = true;
                 txtBxCurFreq.Text = "---";
 
                 // Показываем сообщение только если эксперимент был активен
@@ -579,6 +511,9 @@ namespace DFlasher
             _ui.Post(_ =>
             {
                 txtBxCurItertn.Text = (_seqIndex + 1).ToString();
+                lstBxStimWorkSequence.SelectedIndex = -1;
+                lstBxStimWorkSequence.SelectedIndex = _seqIndex;
+                lstBxStimWorkSequence.Invalidate();
             }, null);
 
             Logger.WriteLog(_seqStimulusStartPc,
@@ -707,6 +642,7 @@ namespace DFlasher
                                 {
                                     btnStart.Enabled = true;
                                     btnStop.Enabled = false;
+                                    lstBxStimWorkSequence.Enabled = true;
                                 }, null);
                             }
                             else
@@ -1005,17 +941,51 @@ namespace DFlasher
             cboStop.SelectedIndex = 1;
             cboData.SelectedIndex = 1;
         }
+        private void RefreshStimulusList()
+        {
+            // сохраняем текущие выделенные индексы
+            int selCount = lstBxStimWorkSequence.SelectedIndices.Count;
+            int[] selected = new int[selCount];
+            for (int i = 0; i < selCount; i++)
+                selected[i] = lstBxStimWorkSequence.SelectedIndices[i];
+
+            GVars.LockCtrl = true;
+
+            lstBxStimWorkSequence.BeginUpdate();
+            try
+            {
+                lstBxStimWorkSequence.Items.Clear();
+                if (Cfg.Stimulus == null) return;
+
+                for (int i = 0; i < Cfg.Stimulus.Count; i++)
+                {
+                    var s = Cfg.Stimulus[i];
+                    int idx = i + 1;
+
+                    lstBxStimWorkSequence.Items.Add(
+                        $"{idx}. Digit={s.Digits}; Freq={s.Frequency}; Durtn={s.Duration}; NeedReact={(s.NeedReaction ? "true" : "false")}"
+                    );
+                }
+
+                // восстановим выделение
+                for (int i = 0; i < selected.Length; i++)
+                {
+                    int idx = selected[i];
+                    if (idx >= 0 && idx < lstBxStimWorkSequence.Items.Count)
+                        lstBxStimWorkSequence.SetSelected(idx, true);
+                }
+            }
+            finally
+            {
+                lstBxStimWorkSequence.EndUpdate();
+                GVars.LockCtrl = false;
+            }
+        }
         private void SetControlsStates()
         {
-            lstBxStimWorkSequence.Items.Clear();
-            for (int i = 0; i < Cfg.Stimulus.Count; i++)
-            {
-                Stimulus stm = Cfg.Stimulus[i];
-                lstBxStimWorkSequence.BeginUpdate();
-                int stimCnt = lstBxStimWorkSequence.Items.Count + 1;
-                lstBxStimWorkSequence.Items.Add(stimCnt.ToString() + ". " + stm.Digits);
-                lstBxStimWorkSequence.EndUpdate();
-            }
+            GVars.LockCtrl = true;
+
+            RefreshStimulusList();
 
             rdoHex.Checked = true;
             // rdoText.Checked = true;
@@ -1038,11 +1008,15 @@ namespace DFlasher
             chckBxNeedRndDigits.Checked = Convert.ToBoolean(Cfg.NeedRandomDigits);
 
             // Sequential настройки (только нужные)
+            
             numUpDwnStartingFreqSequentialMode.Value = Cfg.SequentialStartingFreq;
             numUpDwnTrialCount.Value = Cfg.SequentialTrials;
             numUpDwnBrightnessSequentialMode.Value = Cfg.SequentialBrightness;
+            numUpDwnTrialCount.Value = lstBxStimWorkSequence.Items.Count; 
 
             txtBxDigitsForExclusion.Text = Cfg.DigitsForExclusion;
+
+            GVars.LockCtrl = false;
         }
 
         private void GetControlsStates()
@@ -1276,6 +1250,7 @@ namespace DFlasher
             {
                 btnStart.Enabled = false;
                 btnStop.Enabled = true;
+                lstBxStimWorkSequence.Enabled = false;
                 this.ActiveControl = label6;
             }, null);
 
@@ -1283,6 +1258,10 @@ namespace DFlasher
             {
                 // Sequential: никаких Shepard звуков
                 if (_SndPlayer != null) _SndPlayer.StopAll();
+
+                Brightness = (int)numUpDwnBrightnessSequentialMode.Value;
+                Cfg.Brightness = Brightness;
+                comm.WriteData(BrightnessCmd + Brightness);
 
                 Logger.WriteLog(StartPc, "session_start", "mode=Sequential");
 
@@ -1340,7 +1319,12 @@ namespace DFlasher
                 MessageBox.Show("Список стимулов пуст.", "Ошибка",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                _ui.Post(_ => { btnStart.Enabled = true; btnStop.Enabled = false; }, null);
+                _ui.Post(_ => 
+                { 
+                    btnStart.Enabled = true;
+                    btnStop.Enabled = false;
+                    lstBxStimWorkSequence.Enabled = true;
+                }, null);
                 return;
             }
 
@@ -1356,6 +1340,7 @@ namespace DFlasher
 
             QueryPerformanceCounter(out _seqStimulusStartPc);
 
+            comm.WriteData(BrightnessCmd + Cfg.Brightness);
             comm.WriteData(CurrentDigitCmd + ToHardwareDigit(s.Digits));
             comm.WriteData(CurrentFreqCmd + s.Frequency);
             CurrentFreq = s.Frequency;
@@ -1364,6 +1349,8 @@ namespace DFlasher
             _ui.Post(_ =>
             {
                 txtBxCurItertn.Text = "1";
+                lstBxStimWorkSequence.SelectedIndex = -1;
+                lstBxStimWorkSequence.SelectedIndex = 0;
             }, null);
 
             Logger.WriteLog(_seqStimulusStartPc,
@@ -1404,6 +1391,7 @@ namespace DFlasher
             {
                 btnStart.Enabled = true;
                 btnStop.Enabled = false;
+                lstBxStimWorkSequence.Enabled = true;
             }, null);
         }
         private void btnStop_Click(object sender, EventArgs e)
@@ -1444,6 +1432,7 @@ namespace DFlasher
             {
                 btnStart.Enabled = true;
                 btnStop.Enabled = false;
+                lstBxStimWorkSequence.Enabled = true;
             }, null);
         }
 
@@ -1510,36 +1499,51 @@ namespace DFlasher
 
         private void btnAddStim_Click(object sender, EventArgs e)
         {
-            Stimulus stm = new Stimulus(true);
-            stm.Digits = GenerateAllowedTwoDigitNumber();
-            stm.Duration = 5000;
-            stm.NeedReaction = true;
+            if (Cfg.Stimulus == null)
+                Cfg.Stimulus = new List<Stimulus>();
+
+            Stimulus stm = new Stimulus(true)
+            {
+                Digits = GenerateAllowedTwoDigitNumber(),
+                Frequency = (int)numUpDwnStartingFreqSequentialMode.Value,      // 
+                Duration = (int)numUpDwnTimeStepFreqChngSequentialMode.Value,   // 
+                NeedReaction = true
+            };
 
             Cfg.Stimulus.Add(stm);
 
-            lstBxStimWorkSequence.BeginUpdate();
-            int stimCnt = Cfg.Stimulus.Count;
-            lstBxStimWorkSequence.Items.Add(stimCnt.ToString() + ". " + stm.Digits);
-            if (Cfg.Stimulus.Count > 0)
-            {
-                for (int i = 0; i < Cfg.Stimulus.Count; i++)
-                    lstBxStimWorkSequence.SetSelected(i, false);
-                lstBxStimWorkSequence.SetSelected(Cfg.Stimulus.Count - 1, true);
-            }
-            lstBxStimWorkSequence.EndUpdate();            
+            RefreshStimulusList();
+
+            // выделим добавленный
+            lstBxStimWorkSequence.SelectedIndex = -1;
+            if (lstBxStimWorkSequence.Items.Count > 0)
+                lstBxStimWorkSequence.SelectedIndex = lstBxStimWorkSequence.Items.Count - 1;
         }
 
         private void btnRemoveStim_Click(object sender, EventArgs e)
         {
-            if (lstBxStimWorkSequence.SelectedIndex != -1 && lstBxStimWorkSequence.SelectedIndex != -1)
+            if (Cfg.Stimulus == null || Cfg.Stimulus.Count == 0)
+                return;
+
+            if (lstBxStimWorkSequence.SelectedIndices == null || lstBxStimWorkSequence.SelectedIndices.Count == 0)
+                return;
+
+            // удаляем с конца, чтобы индексы не съезжали
+            var toRemove = lstBxStimWorkSequence.SelectedIndices.Cast<int>().OrderByDescending(i => i).ToList();
+
+            foreach (int idx in toRemove)
             {
-                Cfg.Stimulus.RemoveAt(lstBxStimWorkSequence.SelectedIndex);
-                lstBxStimWorkSequence.Items.Remove(lstBxStimWorkSequence.SelectedItem);
-                for (int i = 0; i < lstBxStimWorkSequence.Items.Count; i++)
-                {
-                    string[] words = lstBxStimWorkSequence.Items[i].ToString().Split(new char[] { ' ' });
-                    lstBxStimWorkSequence.Items[i] = (i + 1).ToString() + ". " + words[1];
-                }
+                if (idx >= 0 && idx < Cfg.Stimulus.Count)
+                    Cfg.Stimulus.RemoveAt(idx);
+            }
+
+            RefreshStimulusList();
+
+            // аккуратно восстановим выделение
+            if (Cfg.Stimulus.Count > 0)
+            {
+                int newIdx = Math.Min(toRemove.Min(), Cfg.Stimulus.Count - 1);
+                lstBxStimWorkSequence.SelectedIndex = newIdx;
             }
         }
 
@@ -1549,42 +1553,81 @@ namespace DFlasher
             {
                 Stimulus stm = Cfg.Stimulus[lstBxStimWorkSequence.SelectedIndex];
                 GVars.LockCtrl = true;
+                numUpDwnStimulusDigit.Value = stm.Digits;
                 numUpDwnStartingFreqSequentialMode.Value = stm.Frequency;
                 numUpDwnTimeStepFreqChngSequentialMode.Value = stm.Duration;
+                numUpDwnTrialCount.Value = lstBxStimWorkSequence.Items.Count;
+
+                if (comm.ComPortIsOpen)
+                {
+                    int d = (int)numUpDwnStimulusDigit.Value;
+                    comm.WriteData(CurrentDigitCmd + ToHardwareDigit(d));
+
+                    int f = (int)numUpDwnStartingFreqSequentialMode.Value;
+                    comm.WriteData(CurrentFreqCmd + ToHardwareDigit(f));
+                }
+
                 GVars.LockCtrl = false;
             }
         }
 
         private void btnClearStim_Click(object sender, EventArgs e)
         {
-            Cfg.Stimulus.Clear();
-            lstBxStimWorkSequence.Items.Clear();
+            if (Cfg.Stimulus == null)
+                Cfg.Stimulus = new List<Stimulus>();
+            else
+                Cfg.Stimulus.Clear();
+
+            RefreshStimulusList();
         }
 
         private void numUpDwnStartingFreqSequentialMode_ValueChanged(object sender, EventArgs e)
         {
             if (!GVars.LockCtrl)
             {
+                bool changed = false;
                 foreach (int SelectedIndex in lstBxStimWorkSequence.SelectedIndices)
                 {
                     Stimulus stm = Cfg.Stimulus[SelectedIndex];
                     stm.Frequency = (int)numUpDwnStartingFreqSequentialMode.Value;
                     Cfg.Stimulus[SelectedIndex] = stm;
+                    changed = true;
+                }
+                if (changed)
+                    RefreshStimulusList();
+
+                if (comm.ComPortIsOpen)
+                {
+                    int f = (int)numUpDwnStartingFreqSequentialMode.Value;
+                    comm.WriteData(CurrentFreqCmd + ToHardwareDigit(f));
                 }
             }
         }
 
         private void numUpDwnTimeStepFreqChngSequentialMode_ValueChanged(object sender, EventArgs e)
         {
-            if (!GVars.LockCtrl)
+            if (GVars.LockCtrl)
+                return;
+
+            if (Cfg.Stimulus == null || Cfg.Stimulus.Count == 0)
+                return;
+
+            bool changed = false;
+
+            foreach (int idx in lstBxStimWorkSequence.SelectedIndices)
             {
-                foreach (int SelectedIndex in lstBxStimWorkSequence.SelectedIndices)
-                {
-                    Stimulus stm = Cfg.Stimulus[SelectedIndex];
-                    stm.Duration = (int)numUpDwnTimeStepFreqChngSequentialMode.Value;
-                    Cfg.Stimulus[SelectedIndex] = stm;
-                }
+                if (idx < 0 || idx >= Cfg.Stimulus.Count)
+                    continue;
+
+                Stimulus stm = Cfg.Stimulus[idx];
+                stm.Duration = (int)numUpDwnTimeStepFreqChngSequentialMode.Value;
+                Cfg.Stimulus[idx] = stm;
+
+                changed = true;
             }
+
+            if (changed)
+                RefreshStimulusList();
         }
 
         private bool TryParseStimulusLine(string line, out Stimulus stim)
@@ -1644,42 +1687,98 @@ namespace DFlasher
 
         private void btnLoadListStimulus_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog dlg = new OpenFileDialog())
+            using (var ofd = new OpenFileDialog())
             {
-                dlg.Filter = "Stimulus list (*.txt)|*.txt|All files (*.*)|*.*";
-                dlg.Title = "Загрузить список стимулов";
+                ofd.Filter = "Stimulus list (*.txt)|*.txt|All files (*.*)|*.*";
+                ofd.Title = "Загрузить список стимулов";
 
-                if (dlg.ShowDialog() != DialogResult.OK)
+                if (ofd.ShowDialog(this) != DialogResult.OK)
                     return;
 
-                try
+                string[] rawLines = File.ReadAllLines(ofd.FileName, Encoding.UTF8);
+
+                // убираем пустые строки
+                var lines = rawLines
+                    .Select(x => (x ?? "").Trim())
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .ToList();
+
+                if (lines.Count == 0)
                 {
-                    var lines = File.ReadAllLines(dlg.FileName);
-
-                    var newList = new List<Stimulus>();
-
-                    foreach (var line in lines)
-                    {
-                        if (TryParseStimulusLine(line, out Stimulus s))
-                            newList.Add(s);
-                    }
-
-                    if (newList.Count == 0)
-                    {
-                        MessageBox.Show("В файле нет валидных стимулов.",
-                            "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-
-                    Cfg.Stimulus.Clear();
-                    Cfg.Stimulus.AddRange(newList);
-
-                    RefreshStimulusListBox();
+                    MessageBox.Show("Файл пуст.", "Загрузка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
-                catch (Exception ex)
+
+                // Первая строка — шапка
+                // Ожидаем: Digits;Frequency;Duration;NeedReaction
+                // Если там что-то другое — не умираем, но предупредим.
+                string header = lines[0];
+                bool headerOk = header.Replace(" ", "").Equals("Digits;Frequency;Duration;NeedReaction", StringComparison.OrdinalIgnoreCase);
+
+                var newList = new List<Stimulus>();
+                int bad = 0;
+
+                // начинаем со 2-й строки
+                for (int i = 1; i < lines.Count; i++)
                 {
-                    MessageBox.Show("Ошибка загрузки:\n" + ex.Message,
-                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    string line = lines[i];
+
+                    var parts = line.Split(new[] { ';' }, StringSplitOptions.None);
+                    if (parts.Length < 4) { bad++; continue; }
+
+                    if (!int.TryParse(parts[0].Trim(), out int digits)) { bad++; continue; }
+                    if (!int.TryParse(parts[1].Trim(), out int freq)) { bad++; continue; }
+                    if (!int.TryParse(parts[2].Trim(), out int dur)) { bad++; continue; }
+
+                    string needStr = parts[3].Trim();
+                    bool need;
+                    if (needStr == "1") need = true;
+                    else if (needStr == "0") need = false;
+                    else if (needStr.Equals("true", StringComparison.OrdinalIgnoreCase)) need = true;
+                    else if (needStr.Equals("false", StringComparison.OrdinalIgnoreCase)) need = false;
+                    else { bad++; continue; }
+
+                    // минимальная гигиена
+                    if (digits < 0 || digits > 99) { bad++; continue; }
+                    if (freq < 0) { bad++; continue; }
+                    if (dur < 0) { bad++; continue; }
+
+                    var s = new Stimulus(true)
+                    {
+                        Digits = digits,
+                        Frequency = freq,
+                        Duration = dur,
+                        NeedReaction = need
+                    };
+
+                    newList.Add(s);
+                }
+
+                if (newList.Count == 0)
+                {
+                    MessageBox.Show("Не удалось загрузить ни одного стимула.\nПроверь формат строк.",
+                        "Загрузка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Истина теперь тут
+                Cfg.Stimulus = newList;
+
+                // UI — только витрина
+                RefreshStimulusList();
+
+                if (lstBxStimWorkSequence.Items.Count > 0)
+                    lstBxStimWorkSequence.SelectedIndex = 0;
+
+                // Сообщение по итогам
+                if (!headerOk || bad > 0)
+                {
+                    var msg = $"Загружено стимулов: {newList.Count}";
+                    if (bad > 0) msg += $"\nПропущено строк: {bad}";
+                    if (!headerOk) msg += "\n\nВнимание: шапка файла отличается от ожидаемой (Digits;Frequency;Duration;NeedReaction).";
+
+                    MessageBox.Show(msg, "Загрузка", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
@@ -1692,33 +1791,130 @@ namespace DFlasher
         {
             if (Cfg.Stimulus == null || Cfg.Stimulus.Count == 0)
             {
-                MessageBox.Show("Список стимулов пуст.",
-                    "Сохранение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Список стимулов пуст.", "Сохранение",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            using (SaveFileDialog dlg = new SaveFileDialog())
-            {
-                dlg.Filter = "Stimulus list (*.txt)|*.txt|All files (*.*)|*.*";
-                dlg.Title = "Сохранить список стимулов";
-                dlg.FileName = "stimulus_list.txt";
 
-                if (dlg.ShowDialog() != DialogResult.OK)
+            using (var sfd = new SaveFileDialog())
+            {
+                sfd.Filter = "Stimulus list (*.txt)|*.txt|All files (*.*)|*.*";
+                sfd.Title = "Сохранить список стимулов";
+                sfd.FileName = "stimulus_list.txt";
+
+                if (sfd.ShowDialog(this) != DialogResult.OK)
                     return;
 
-                try
-                {
-                    var lines = Cfg.Stimulus
-                        .Select(s => StimulusToLine(s))
-                        .ToArray();
+                var lines = new List<string>();
 
-                    File.WriteAllLines(dlg.FileName, lines);
-                }
-                catch (Exception ex)
+                // ШАПКА (как просил): обозначения полей
+                lines.Add("Digits;Frequency;Duration;NeedReaction");
+
+                // ДАННЫЕ: только значения
+                foreach (var s in Cfg.Stimulus)
                 {
-                    MessageBox.Show("Ошибка сохранения:\n" + ex.Message,
-                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    int need = s.NeedReaction ? 1 : 0;
+                    lines.Add($"{s.Digits};{s.Frequency};{s.Duration};{need}");
+                }
+
+                File.WriteAllLines(sfd.FileName, lines, Encoding.UTF8);
+            }
+        }
+
+        private void numUpDwnStimulusDigit_ValueChanged(object sender, EventArgs e)
+        {
+            if (!GVars.LockCtrl)
+            {
+                bool changed = false;
+                foreach (int SelectedIndex in lstBxStimWorkSequence.SelectedIndices)
+                {
+                    Stimulus stm = Cfg.Stimulus[SelectedIndex];
+                    stm.Digits = (int)numUpDwnStimulusDigit.Value;
+                    Cfg.Stimulus[SelectedIndex] = stm;
+                    changed = true;
+                }
+                if (changed)
+                    RefreshStimulusList();
+
+                if (comm.ComPortIsOpen)
+                {
+                    int d = (int)numUpDwnStimulusDigit.Value;
+                    comm.WriteData(CurrentDigitCmd + ToHardwareDigit(d));
                 }
             }
+        }
+
+        private void numUpDwnBrightnessSequentialMode_ValueChanged(object sender, EventArgs e)
+        {
+            if (GVars.LockCtrl)
+                return;
+
+            int b = (int)numUpDwnBrightnessSequentialMode.Value;
+
+            Cfg.Brightness = b;
+            Brightness = b;
+
+            //срузу применяем, чтобы видеть
+            if (comm.ComPortIsOpen)
+            {
+                comm.WriteData(BrightnessCmd + b);
+            }
+        }
+        private void lstBxStimWorkSequence_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0)
+                return;
+
+            ListBox lb = (ListBox)sender;
+
+            bool selected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
+
+            // Задаем цвета для активного и неактивного ListBox
+            Color back;
+            Color fore;
+
+            if (lb.Enabled) // Если ListBox активен
+            {
+                if (selected)
+                {
+                    // Бледно-синий для выбранной строки
+                    back = Color.FromArgb(180, 200, 230);
+                    fore = Color.Black;
+                }
+                else
+                {
+                    back = lb.BackColor;
+                    fore = lb.ForeColor;
+                }
+            }
+            else // Если ListBox не активен
+            {
+                if (selected)
+                {
+                    back = Color.FromArgb(180, 200, 230);  // Бледно-синий для выделенной строки
+                    fore = Color.Gray;  // Для неактивного выделения серый цвет
+                }
+                else
+                {
+                    back = lb.BackColor;
+                    fore = Color.Gray; // Темно-серый текст для неактивного состояния
+                }
+            }
+
+            using (SolidBrush b = new SolidBrush(back))
+                e.Graphics.FillRectangle(b, e.Bounds);
+
+            string text = lb.Items[e.Index].ToString();
+
+            TextRenderer.DrawText(
+                e.Graphics,
+                text,
+                lb.Font,
+                e.Bounds,
+                fore,
+                TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
+
+            e.DrawFocusRectangle();
         }
     }
 }

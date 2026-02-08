@@ -1,8 +1,7 @@
-digits=21;freq=5;dur=5000;needReaction=true
-digits=99;freq=10;dur=5000;needReaction=true
-digits=30;freq=5;dur=5000;needReaction=true
-digits=22;freq=10;dur=5000;needReaction=true
-digits=82;freq=5;dur=5000;needReaction=true
-digits=70;freq=10;dur=5000;needReaction=true
-digits=82;freq=5;dur=5000;needReaction=true
-digits=36;freq=10;dur=5000;needReaction=true
+﻿Digits;Frequency;Duration;NeedReaction
+23;5;10001;1
+52;5;9998;1
+81;5;10002;1
+86;5;10007;1
+24;5;9996;1
+96;5;10003;1

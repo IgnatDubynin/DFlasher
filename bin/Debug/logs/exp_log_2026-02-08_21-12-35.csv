@@ -1,0 +1,7 @@
+﻿timestamp_ms;event;details
+0;session_start;mode=Sequential
+18.323;stimulus_start;idx=0;digits=84;freq=6;dur=8000;needReaction=1
+3643.23;stimulus_answer;idx=0;input=84;target=84;correct=1;rtMs=2501
+3643.245;stimulus_start;idx=1;digits=23;freq=8;dur=8000;needReaction=1
+7445.684;stimulus_answer;idx=1;input=23;target=23;correct=1;rtMs=3549
+7445.698;stimulus_start;idx=2;digits=19;freq=15;dur=8000;needReaction=1

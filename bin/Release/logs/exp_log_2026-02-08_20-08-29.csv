@@ -1,0 +1,4 @@
+﻿timestamp_ms;event;details
+0;session_start;mode=Sequential
+5.314;stimulus_start;idx=0;digits=83;freq=30;dur=5000;needReaction=1
+900.854;sequence_stop;mode=Sequential;reason=manual

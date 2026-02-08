@@ -1,0 +1,15 @@
+﻿timestamp_ms;event;details
+0;session_start;mode=Sequential
+6.253;stimulus_start;idx=0;digits=88;freq=50;dur=3000;needReaction=1
+3174.378;stimulus_answer;idx=0;input=88;target=88;correct=1;rtMs=1953
+3174.392;stimulus_start;idx=1;digits=11;freq=50;dur=3000;needReaction=1
+5829.704;stimulus_answer;idx=1;input=45;target=11;correct=0;rtMs=1777
+5829.718;stimulus_start;idx=2;digits=55;freq=50;dur=3000;needReaction=1
+7966.749;stimulus_answer;idx=2;input=45;target=55;correct=0;rtMs=719
+7966.764;stimulus_start;idx=3;digits=11;freq=50;dur=3000;needReaction=1
+14739.19;stimulus_answer;idx=3;input=45;target=11;correct=0;rtMs=990
+14739.204;stimulus_start;idx=4;digits=88;freq=50;dur=3000;needReaction=1
+17740.24;stimulus_timeout;idx=4
+20988.934;stimulus_answer;idx=4;input=45;target=88;correct=0;rtMs=n/a
+20988.95;stimulus_start;idx=5;digits=55;freq=50;dur=3000;needReaction=1
+23078.562;sequence_stop;mode=Sequential;reason=manual

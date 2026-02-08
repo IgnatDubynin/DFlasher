@@ -36,6 +36,8 @@ namespace DFlasher
         public int IteratinsCount { get; set; } = 3;//количество итераций
         public string DigitsForExclusion { get; set; } = "";//список чисел, которые нельзя генерировать при показе
 
+        public List<Stimulus> Stimulus { get; set; }//список групп стимулов, из которых будет формироваться список стимулов для предъявления
+
         public static Configuration Load(string fileName)
         {
             if (!File.Exists(fileName))
@@ -53,6 +55,10 @@ namespace DFlasher
 
             string json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(fileName, json);
+        }
+        public Configuration()
+        {
+            Stimulus = new List<Stimulus>();
         }
     }
 }

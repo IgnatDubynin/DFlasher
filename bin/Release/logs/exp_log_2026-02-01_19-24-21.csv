@@ -1,0 +1,3 @@
+﻿timestamp_ms;event;details
+0;session_start;startFreq=60;stepHz=10;stepTime=500;target=83;minIters=3;sigmaMax=3;randDigits=1
+18112.849;session_stop;reason=manual;freq=24 target_final= 66

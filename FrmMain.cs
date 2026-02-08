@@ -86,15 +86,24 @@ namespace DFlasher
         private static extern bool QueryPerformanceCounter(out long lpPerformanceCount);
         [DllImport("Kernel32.dll")]
         private static extern bool QueryPerformanceFrequency(out long lpFrequency);
-
+        public enum TPresentationState { None, Presenting, WaitingInput, Stopped };
         public enum WS { wsStoped, wsFreqSearch, wsWaiting, wsFreqFound, wsFreqSearchByStep, wsReset };
         public WS WrkState = WS.wsStoped;
+
+        private TPresentationState _seqState = TPresentationState.None;
+        private bool _seqInputStarted = false; // пользователь уже начал ввод 
+        private long _seqFirstKeyPc = 0;   // момент первой реакции
+
+        private int _seqIndex = 0;
+        private long _seqStimulusStartPc = 0;   //для отслеживания Duration текущего стимула
 
         public long Pf;
         public long Pc;
         public long LastPc;
         public long LastPc2;
         public long StartPc;
+
+        private volatile bool _sessionRunning = false;
 
         private SynchronizationContext _ui;
 
@@ -133,7 +142,6 @@ namespace DFlasher
         {
             Directory.CreateDirectory(Path.GetDirectoryName(configFile));
 
-            _ui = SynchronizationContext.Current;
             QueryPerformanceFrequency(out Pf);
             _intervalTicks = Pf / 100; // 10 мс
             QueryPerformanceCounter(out LastPc);
@@ -148,9 +156,16 @@ namespace DFlasher
 
             InitializeComponent();
 
+            _ui = SynchronizationContext.Current; // 
+
+            _sessionRunning = false;
+            StartPc = 0;
+            txtBxExpTime.Text = "00:00:00.000";   // напрямую, без Post
+
             InitRandom();
 
             this.KeyPreview = true;
+            tabControl2.SelectedTab = tabPage4;
 
         }
         private void PrepareExcludedDigits(string raw)
@@ -199,12 +214,115 @@ namespace DFlasher
             TwoDigitNumber = GenerateAllowedTwoDigitNumber();//_rnd.Next(10, 100);
             comm.WriteData(CurrentDigitCmd + ToHardwareDigit(TwoDigitNumber));
         }
+        private void ProcessSequentialTimer()
+        {
+            if (_seqState == TPresentationState.None ||
+                _seqState == TPresentationState.Stopped)
+                return;
+
+            if (Cfg.Stimulus == null ||
+                Cfg.Stimulus.Count == 0 ||
+                _seqIndex < 0 ||
+                _seqIndex >= Cfg.Stimulus.Count)
+            {
+                QueryPerformanceCounter(out long pcNow);
+                StopSequential(pcNow, "invalid_index_or_empty_list", false);
+                return;
+            }
+
+            // если человек уже начал ввод — таймер больше не действует
+            if (_seqInputStarted)
+                return;
+
+            QueryPerformanceCounter(out Pc);
+
+            var s = Cfg.Stimulus[_seqIndex];
+
+            long elapsedMs = (Pc - _seqStimulusStartPc) * 1000 / Pf;
+
+            if (_seqState != TPresentationState.Presenting)
+                return;
+
+            if (elapsedMs < s.Duration)
+                return;
+
+            // ===== TIMEOUT =====
+
+            if (s.NeedReaction)
+            {
+                comm.WriteData(CurrentFreqCmd + "196");
+                CurrentFreq = 196;
+
+                _seqState = TPresentationState.WaitingInput;
+                _digitBuf.Clear();
+
+                Logger.WriteLog(Pc,
+                    "stimulus_timeout",
+                    $"idx={_seqIndex}");
+
+                return;
+            }
+
+            // без реакции → следующий
+
+            _seqIndex++;
+
+            if (_seqIndex >= Cfg.Stimulus.Count)
+            {
+                StopSequential(Pc, "completed_all_stimuli", false);
+                return;
+            }
+
+            var next = Cfg.Stimulus[_seqIndex];
+
+            QueryPerformanceCounter(out _seqStimulusStartPc);
+
+            _seqState = TPresentationState.Presenting;
+            _seqInputStarted = false;
+            _seqFirstKeyPc = 0;
+            _digitBuf.Clear();
+
+            comm.WriteData(CurrentDigitCmd + ToHardwareDigit(next.Digits));
+            comm.WriteData(CurrentFreqCmd + next.Frequency);
+            CurrentFreq = next.Frequency;
+
+            _ui.Post(_ =>
+            {
+                txtBxCurItertn.Text = (_seqIndex + 1).ToString();
+            }, null);
+
+            Logger.WriteLog(_seqStimulusStartPc,
+                "stimulus_start",
+                $"idx={_seqIndex};digits={next.Digits};freq={next.Frequency};dur={next.Duration};needReaction={(next.NeedReaction ? 1 : 0)}");
+        }
+        private void UpdateExpTime(long pcNow)
+        {
+            if (!_sessionRunning) return;
+            if (StartPc <= 0) return;
+            if (pcNow < StartPc) return;
+
+            if (pcNow < LastPc + _intervalTicks) return;
+
+            double elapsedSeconds = (double)(pcNow - StartPc) / Pf;
+            string formatted = TimeSpan.FromSeconds(elapsedSeconds).ToString(@"hh\:mm\:ss\.fff");
+
+            _ui.Post(_ => txtBxExpTime.Text = formatted, null);
+            LastPc = pcNow;
+        }
         private void TmrCallbckForMainProcessing(int id, int msg, IntPtr user, int dw1, int dw2)
         {
+            QueryPerformanceCounter(out Pc);
+
+            if (Cfg.Mode == ExperimentMode.Sequential)
+            {
+                ProcessSequentialTimer();
+                UpdateExpTime(Pc);
+                return;
+            }
+
+            // ===== Staircase как было =====
             if (WrkState != WS.wsStoped)
             {
-                QueryPerformanceCounter(out Pc);
-
                 if (WrkState == WS.wsFreqSearch)
                 {
                     if (Pc >= LastPc2 + StepTimeInTicks)
@@ -215,7 +333,6 @@ namespace DFlasher
                             {
                                 if (!comm.WriteData(DecCurrentFreqCmd))
                                 {
-                                    // Не удалось отправить - останавливаем эксперимент
                                     SafeStopExperiment("Потеря связи с устройством");
                                     return;
                                 }
@@ -224,16 +341,10 @@ namespace DFlasher
                             }
                             else
                             {
-                                if (_SndPlayer != null)
-                                {
-                                    _SndPlayer.StopAll();
-                                }
-                                // упёрлись в минимум — развернуть направление
-                                // _sweepDir = +1;
-                                //WrkState = WS.wsStoped;
+                                if (_SndPlayer != null) _SndPlayer.StopAll();
                             }
                         }
-                        else // _sweepDir > 0
+                        else
                         {
                             if (CurrentFreq < Cfg.StartingFreq)
                             {
@@ -247,13 +358,7 @@ namespace DFlasher
                             }
                             else
                             {
-                                if (_SndPlayer != null)
-                                {
-                                    _SndPlayer.StopAll();
-                                }
-                                // упёрлись в максимум — развернуть направление
-                                //_sweepDir = -1;
-                                //WrkState = WS.wsStoped;
+                                if (_SndPlayer != null) _SndPlayer.StopAll();
                             }
                         }
 
@@ -261,24 +366,93 @@ namespace DFlasher
                     }
                 }
 
-                if (Pc >= LastPc + _intervalTicks)
-                {
-                    double elapsedSeconds = (double)(Pc - StartPc) / Pf;
-                    string formatted = TimeSpan.FromSeconds(elapsedSeconds).ToString(@"hh\:mm\:ss\.fff");
-
-                    _ui.Post(_ => txtBxExpTime.Text = formatted, null);
-
-                    LastPc = Pc;
-                }
+                UpdateExpTime(Pc);
             }
         }
+        /*        private void TmrCallbckForMainProcessing(int id, int msg, IntPtr user, int dw1, int dw2)
+                {
+                    if (Cfg.Mode == ExperimentMode.Sequential)
+                    {
+                        ProcessSequentialTimer();
+
+                        // можно обновлять время сессии общим StartPc
+                        QueryPerformanceCounter(out Pc);
+                        if (Pc >= LastPc + _intervalTicks)
+                        {
+                            double elapsedSeconds = (double)(Pc - StartPc) / Pf;
+                            string formatted = TimeSpan.FromSeconds(elapsedSeconds).ToString(@"hh\:mm\:ss\.fff");
+                            _ui.Post(_ => txtBxExpTime.Text = formatted, null);
+                            LastPc = Pc;
+                        }
+                        return;
+                    }
+
+                    // ===== Staircase как было =====
+                    if (WrkState != WS.wsStoped)
+                    {
+                        QueryPerformanceCounter(out Pc);
+
+                        if (WrkState == WS.wsFreqSearch)
+                        {
+                            if (Pc >= LastPc2 + StepTimeInTicks)
+                            {
+                                if (_sweepDir < 0)
+                                {
+                                    if (CurrentFreq > MinFreqHz)
+                                    {
+                                        if (!comm.WriteData(DecCurrentFreqCmd))
+                                        {
+                                            SafeStopExperiment("Потеря связи с устройством");
+                                            return;
+                                        }
+                                        CurrentFreq--;
+                                        if (NeedRandomDigits == 1) SendRandomDigits();
+                                    }
+                                    else
+                                    {
+                                        if (_SndPlayer != null) _SndPlayer.StopAll();
+                                    }
+                                }
+                                else
+                                {
+                                    if (CurrentFreq < Cfg.StartingFreq)
+                                    {
+                                        if (!comm.WriteData(IncCurrentFreqCmd))
+                                        {
+                                            SafeStopExperiment("Потеря связи с устройством");
+                                            return;
+                                        }
+                                        CurrentFreq++;
+                                        if (NeedRandomDigits == 1) SendRandomDigits();
+                                    }
+                                    else
+                                    {
+                                        if (_SndPlayer != null) _SndPlayer.StopAll();
+                                    }
+                                }
+
+                                LastPc2 = Pc;
+                            }
+                        }
+
+                        if (Pc >= LastPc + _intervalTicks)
+                        {
+                            double elapsedSeconds = (double)(Pc - StartPc) / Pf;
+                            string formatted = TimeSpan.FromSeconds(elapsedSeconds).ToString(@"hh\:mm\:ss\.fff");
+                            _ui.Post(_ => txtBxExpTime.Text = formatted, null);
+                            LastPc = Pc;
+                        }
+                    }
+                }*/
         private void SafeStopExperiment(string reason)
-        {
+        {        
             // Сохраняем состояние
             bool wasRunning = (WrkState != WS.wsStoped);
 
             // Останавливаем эксперимент
             WrkState = WS.wsStoped;
+
+            _sessionRunning = false;
 
             // Останавливаем звуки
             if (_SndPlayer != null)
@@ -330,27 +504,123 @@ namespace DFlasher
             digit = 0;
             return false;
         }
+        private void HandleSequentialKeypress(int vk, long pcNow)
+        {
+            if (_seqState != TPresentationState.Presenting &&
+                _seqState != TPresentationState.WaitingInput)
+                return;
+
+            // первая реакция — фиксируем RT
+            if (!_seqInputStarted)
+            {
+                _seqInputStarted = true;
+                _seqFirstKeyPc = pcNow;
+            }
+
+            // цифры
+            if (TryGetDigitFromVk(vk, out int digit))
+            {
+                if (_digitBuf.Length < 2)
+                    _digitBuf.Append((char)('0' + digit));
+                return;
+            }
+
+            // Enter
+            if (vk != 0x0D)
+                return;
+
+            if (_digitBuf.Length != 2)
+                return;
+
+            int entered = int.Parse(_digitBuf.ToString());
+            _digitBuf.Clear();
+
+            int target = Cfg.Stimulus[_seqIndex].Digits;
+            bool correct = (entered == target);
+
+            // RT
+            string rtStr = "n/a";
+
+            if (_seqState == TPresentationState.Presenting &&
+                _seqFirstKeyPc > 0)
+            {
+                long rtMs = (_seqFirstKeyPc - _seqStimulusStartPc) * 1000 / Pf;
+                rtStr = rtMs.ToString();
+            }
+
+            // ===== LOG =====
+            Logger.WriteLog(pcNow,
+                "stimulus_answer",
+                $"idx={_seqIndex};input={entered};target={target};correct={(correct ? 1 : 0)};rtMs={rtStr}");
+
+            // ===== следующий =====
+
+            _seqIndex++;
+
+            if (_seqIndex >= Cfg.Stimulus.Count)
+            {
+                StopSequential(pcNow, "completed_all_stimuli", false);
+                return;
+            }
+
+            var s = Cfg.Stimulus[_seqIndex];
+
+            QueryPerformanceCounter(out _seqStimulusStartPc);
+
+            _seqState = TPresentationState.Presenting;
+            _seqInputStarted = false;
+            _seqFirstKeyPc = 0;
+            _digitBuf.Clear();
+
+            comm.WriteData(CurrentDigitCmd + ToHardwareDigit(s.Digits));
+            comm.WriteData(CurrentFreqCmd + s.Frequency);
+            CurrentFreq = s.Frequency;
+
+            _ui.Post(_ =>
+            {
+                txtBxCurItertn.Text = (_seqIndex + 1).ToString();
+            }, null);
+
+            Logger.WriteLog(_seqStimulusStartPc,
+                "stimulus_start",
+                $"idx={_seqIndex};digits={s.Digits};freq={s.Frequency};dur={s.Duration};needReaction={(s.NeedReaction ? 1 : 0)}");
+        }
         // ==== Глобальный хук: ловим любую клавишу, цифры и Enter ====
         private IntPtr KeyboardHookProc(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode < 0)
                 return CallNextHookEx(_hook, nCode, wParam, lParam);
 
-            const int WM_KEYDOWN = 0x0100;
-            if (wParam != (IntPtr)WM_KEYDOWN)
+            const int WM_KEYDOWN_LOCAL = 0x0100;
+            if (wParam != (IntPtr)WM_KEYDOWN_LOCAL)
                 return CallNextHookEx(_hook, nCode, wParam, lParam);
 
-            if (!comm.ComPortIsOpen || WrkState == WS.wsStoped)
+            if (!comm.ComPortIsOpen)
+                return CallNextHookEx(_hook, nCode, wParam, lParam);
+
+            // ВАЖНО: Sequential разрешаем даже если WrkState == wsStoped
+            bool seqRunning = (Cfg.Mode == ExperimentMode.Sequential) &&
+                              (_seqState != TPresentationState.None) &&
+                              (_seqState != TPresentationState.Stopped);
+
+            if (!seqRunning && WrkState == WS.wsStoped)
                 return CallNextHookEx(_hook, nCode, wParam, lParam);
 
             KBDLLHOOKSTRUCT k = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
             int vk = k.vkCode;
 
             QueryPerformanceCounter(out long pcNow);
+
+            if (Cfg.Mode == ExperimentMode.Sequential)
+            {
+                HandleSequentialKeypress(vk, pcNow);
+                return CallNextHookEx(_hook, nCode, wParam, lParam);
+            }
+
+            // ===== Staircase логика как было =====
             double msFromStart = (pcNow - StartPc) * 1000.0 / Pf;
             int freqNow = CurrentFreq;
 
-            // Первый "любой" нажим — переводим в wsWaiting и фиксируем событие
             if (WrkState != WS.wsWaiting)
             {
                 WrkState = WS.wsWaiting;
@@ -375,10 +645,7 @@ namespace DFlasher
                 if (TryGetDigitFromVk(vk, out digit))
                 {
                     if (_digitBuf.Length < 2)
-                    {
-                        // добавляем именно символ цифры, а не (char)vk
                         _digitBuf.Append((char)('0' + digit));
-                    }
                 }
                 else if (vk == 0x0D) // Enter
                 {
@@ -397,19 +664,14 @@ namespace DFlasher
                                     _isCorrect[_isCorrect.Count - 1] = true;
                             }
 
-                            // ==== итерация ====
                             CurrentIteration++;
-
-                            // текущий порог = текущая частота (на момент первого тычка)
                             CurrentThreshold = freqNow;
 
-                            // средний порог
                             _allThresholds.Add(CurrentThreshold);
                             AvgThreshold = _allThresholds.Average();
 
                             double sigma = ComputeSigmaHz();
 
-                            // вывести на контролы
                             _ui.Post(_ =>
                             {
                                 txtBxCurItertn.Text = CurrentIteration.ToString();
@@ -418,10 +680,8 @@ namespace DFlasher
                                 txtBxCurSigma.Text = sigma.ToString("0.###");
                             }, null);
 
-                            // 0 тоже «хорошо», но нужен минимум итераций
-                            if (CurrentIteration >= IteratinsCount && sigma <= Cfg.StdDevThreshold) 
+                            if (CurrentIteration >= IteratinsCount && sigma <= Cfg.StdDevThreshold)
                             {
-                                // ЛОГ ОТВЕТА БЕЗ ПРЫЖКА
                                 string details = string.Format(
                                     "input={0};target={1};correct=1;CurFreq={2};σ={3:0.###}",
                                     entered, TwoDigitNumber, freqNow, sigma);
@@ -429,86 +689,62 @@ namespace DFlasher
                                 Logger.WriteLog(pcNow, "answer", details);
 
                                 WrkState = WS.wsStoped;
+                                _sessionRunning = false;
                                 Logger.WriteLog(pcNow, "stop",
                                     string.Format("σ-threshold reached;freq={0};σ={1:0.###}", freqNow, sigma));
 
-                                // Вернуть стимуляцию к начальному значению (если так задумано)
                                 comm.WriteData(CurrentFreqCmd + Cfg.StartingFreq.ToString());
-
                                 Logger.Flush();
 
                                 if (_SndPlayer != null)
                                 {
-                                    // на всякий случай глушим ползущие Shepard'ы
                                     _SndPlayer.Stop("shep_up");
                                     _SndPlayer.Stop("shep_down");
-
-                                    // наш жирный органный пабамм
-                                    _SndPlayer.Play("success_pabam", false); // false — без зацикливания
+                                    _SndPlayer.Play("success_pabam", false);
                                 }
 
-                                // UI: обновим поля
                                 _ui.Post(_ =>
                                 {
-                                    //txtBxCurItertn.Text = CurrentIteration.ToString();
-                                    //txtBxCurThresshld.Text = CurrentFreq.ToString("0.###");
-                                    //txtBxCurSigma.Text = "";
-
-                                    // кнопки в состояние «можно снова стартовать»
                                     btnStart.Enabled = true;
                                     btnStop.Enabled = false;
                                 }, null);
                             }
                             else
                             {
-                                // ЛОГ ОТВЕТА: только текущая частота и σ
                                 string details = string.Format(
                                     "input={0};target={1};correct=1;CurFreq={2};σ={3:0.###}",
                                     entered, TwoDigitNumber, freqNow, sigma);
 
                                 Logger.WriteLog(pcNow, "answer", details);
 
-                                // текущий знак ползания
                                 int oldDir = _sweepDir;
-
-                                // частота для следующего цикла (новый старт после прыжка)
                                 int newStartFreq = CurrentFreq + oldDir * Cfg.StepJumpFreq;
 
-                                // ОГРАНИЧЕНИЕ: [1; Cfg.StartingFreq]
-                                if (newStartFreq < 1)
-                                    newStartFreq = 1;
-                                if (newStartFreq > Cfg.StartingFreq)
-                                    newStartFreq = Cfg.StartingFreq;
+                                if (newStartFreq < 1) newStartFreq = 1;
+                                if (newStartFreq > Cfg.StartingFreq) newStartFreq = Cfg.StartingFreq;
 
-                                // выполняем сам прыжок
                                 CurrentFreq = newStartFreq;
                                 comm.WriteData(CurrentFreqCmd + CurrentFreq.ToString());
 
-                                // новая случайная цифра
                                 SendRandomDigits();
 
-                                // новое направление ползания
                                 _sweepDir = -oldDir;
                                 string workDir = (_sweepDir < 0 ? "down" : "up");
-
 
                                 if (_SndPlayer != null)
                                 {
                                     if (_sweepDir < 0)
                                     {
-                                        // вниз: включаем down, глушим up
                                         _SndPlayer.Stop("shep_up");
                                         _SndPlayer.Play("shep_down", true);
                                     }
-                                    else if (_sweepDir > 0)
+                                    else
                                     {
-                                        // вверх: включаем up, глушим down
                                         _SndPlayer.Stop("shep_down");
                                         _SndPlayer.Play("shep_up", true);
                                     }
                                 }
 
-                                // лог прыжка и направления работы
                                 Logger.WriteLog(pcNow, "jump",
                                     string.Format("NewStartFreq={0};dir={1}", CurrentFreq, workDir));
 
@@ -516,9 +752,8 @@ namespace DFlasher
                                 WrkState = WS.wsFreqSearch;
                             }
                         }
-                        else // неверная цифра — всё равно делаем скачок, но без учёта в пороге/σ
+                        else
                         {
-                            // лог ответа: без σ, но с текущей частотой
                             string details = string.Format(
                                 "input={0};target={1};correct=0;CurFreq={2}",
                                 entered, TwoDigitNumber, freqNow);
@@ -526,20 +761,14 @@ namespace DFlasher
                             Logger.WriteLog(pcNow, "answer", details);
 
                             int oldDir = _sweepDir;
-
-                            // частота для следующего цикла (новый старт после прыжка)
                             int newStartFreq = CurrentFreq + oldDir * Cfg.StepJumpFreq;
 
-                            // ОГРАНИЧЕНИЕ: [1; Cfg.StartingFreq]
-                            if (newStartFreq < 1)
-                                newStartFreq = 1;
-                            if (newStartFreq > Cfg.StartingFreq)
-                                newStartFreq = Cfg.StartingFreq;
+                            if (newStartFreq < 1) newStartFreq = 1;
+                            if (newStartFreq > Cfg.StartingFreq) newStartFreq = Cfg.StartingFreq;
 
                             CurrentFreq = newStartFreq;
                             comm.WriteData(CurrentFreqCmd + CurrentFreq.ToString());
 
-                            //Новая случайная цифра
                             SendRandomDigits();
 
                             _sweepDir = -oldDir;
@@ -549,13 +778,11 @@ namespace DFlasher
                             {
                                 if (_sweepDir < 0)
                                 {
-                                    // вниз: включаем down, глушим up
                                     _SndPlayer.Stop("shep_up");
                                     _SndPlayer.Play("shep_down", true);
                                 }
-                                else if (_sweepDir > 0)
+                                else
                                 {
-                                    // вверх: включаем up, глушим down
                                     _SndPlayer.Stop("shep_down");
                                     _SndPlayer.Play("shep_up", true);
                                 }
@@ -568,12 +795,7 @@ namespace DFlasher
                             WrkState = WS.wsFreqSearch;
                         }
                     }
-                    else
-                    {
-                        // Enter на неполных 2 цифрах — игнор
-                    }
                 }
-                // прочие клавиши игнорируем
             }
 
             return CallNextHookEx(_hook, nCode, wParam, lParam);
@@ -785,6 +1007,16 @@ namespace DFlasher
         }
         private void SetControlsStates()
         {
+            lstBxStimWorkSequence.Items.Clear();
+            for (int i = 0; i < Cfg.Stimulus.Count; i++)
+            {
+                Stimulus stm = Cfg.Stimulus[i];
+                lstBxStimWorkSequence.BeginUpdate();
+                int stimCnt = lstBxStimWorkSequence.Items.Count + 1;
+                lstBxStimWorkSequence.Items.Add(stimCnt.ToString() + ". " + stm.Digits);
+                lstBxStimWorkSequence.EndUpdate();
+            }
+
             rdoHex.Checked = true;
             // rdoText.Checked = true;
             cmdSend.Enabled = false;
@@ -986,15 +1218,14 @@ namespace DFlasher
                 return;
             }
 
-            //если уже идёт эксперимент — игнорируем повторный старт
+            // если уже идёт эксперимент — игнорируем повторный старт
             if (WrkState != WS.wsStoped)
                 return;
 
-            // ПРОВЕРКА 2: Связь работает (тестовая команда)
-            if (!comm.WriteData("S"))  // Команда статуса
+            // Проверка связи
+            if (!comm.WriteData("S"))
             {
-                MessageBox.Show("Нет связи с устройством!\n" +
-                               "Проверьте подключение и повторите попытку.",
+                MessageBox.Show("Нет связи с устройством!\nПроверьте подключение и повторите попытку.",
                                "Ошибка связи",
                                MessageBoxButtons.OK,
                                MessageBoxIcon.Error);
@@ -1002,56 +1233,33 @@ namespace DFlasher
             }
 
             WrkState = WS.wsStoped;
-            Thread.Sleep(5);   // дать таймеру выйти из callback
+            Thread.Sleep(5);
 
-            // Если предыдущая сессия была, закрываем лог перед новым стартом
             Logger.Flush();
-
             GetControlsStates();
 
             Brightness = Cfg.Brightness;
-
             IteratinsCount = Cfg.IteratinsCount;
             NeedRandomDigits = Cfg.NeedRandomDigits;
 
             PrepareExcludedDigits(Cfg.DigitsForExclusion);
-
             InitRandom();
 
-            SendRandomDigits();// целевая цифра 
-
-            int startFreq = Cfg.StartingFreq;
-
-            // Команды в устройство
-            comm.WriteData(BrightnessCmd + Brightness);
-            comm.WriteData(CurrentDigitCmd + ToHardwareDigit(TwoDigitNumber));
-            comm.WriteData(CurrentFreqCmd + startFreq);
-
-            // Локальные/глобальные переменные эксперимента
-            CurrentIteration = 0;
-            CurrentThreshold = startFreq;
-            CurrentFreq = startFreq;   // синхронизируем переменную с фактической частотой
-            AvgThreshold = 0;
-
-            // Пересчёт интервала (long!)
-            StepTimeInTicks = (long)Pf * (long)Cfg.TimeStepFreqChngMs / 1000L;
-
-            // Стартовые тики
+            // Общий стартовый тайм для логов/таймера
             QueryPerformanceCounter(out StartPc);
             LastPc = StartPc;
-            LastPc2 = StartPc;         // сбрасываем "метку" для ползания
+            LastPc2 = StartPc;
 
-            // Логгер — новый файл на каждый старт (append = false)
+            // старт времени сессии
+            _sessionRunning = true;
+            _ui.Post(_ => txtBxExpTime.Text = "00:00:00.000", null);
+
+            // Логгер — новый файл на каждый старт
             string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", "exp_log.csv");
             Logger.Init(logPath, StartPc, Pf, false);
 
-            Logger.WriteLog(StartPc, "session_start",
-                $"startFreq={startFreq};stepHz={Cfg.StepJumpFreq};stepTime={Cfg.TimeStepFreqChngMs};" +
-                $"target={TwoDigitNumber};minIters={IteratinsCount};sigmaMax={Cfg.StdDevThreshold:0.###};randDigits={NeedRandomDigits}");
-
-            // <<< УБРАНО: не пишем фейковый jump в t=0, он всё только путает
-            // Logger.WriteLog(StartPc, "jump",
-            //     $"NewStartFreq={CurrentFreq};dir={(_sweepDir < 0 ? "down" : "up")}");
+            // Общие команды в устройство
+            comm.WriteData(BrightnessCmd + Brightness);
 
             // Очистки буферов
             _digitBuf.Clear();
@@ -1063,7 +1271,48 @@ namespace DFlasher
                 _allThresholds.Clear();
             }
 
-            // Направление/очередь скачков
+            // UI (кнопки)
+            _ui.Post(_ =>
+            {
+                btnStart.Enabled = false;
+                btnStop.Enabled = true;
+                this.ActiveControl = label6;
+            }, null);
+
+            if (Cfg.Mode == ExperimentMode.Sequential)
+            {
+                // Sequential: никаких Shepard звуков
+                if (_SndPlayer != null) _SndPlayer.StopAll();
+
+                Logger.WriteLog(StartPc, "session_start", "mode=Sequential");
+
+                StartSequentialMode();
+                return;
+            }
+
+            // ===== Staircase старт =====
+
+            // стартовая цифра (цель) для лестницы
+            SendRandomDigits();
+
+            int startFreq = Cfg.StartingFreq;
+
+            // Команды в устройство
+            comm.WriteData(CurrentDigitCmd + ToHardwareDigit(TwoDigitNumber));
+            comm.WriteData(CurrentFreqCmd + startFreq);
+
+            // Локальные переменные лестницы
+            CurrentIteration = 0;
+            CurrentThreshold = startFreq;
+            CurrentFreq = startFreq;
+            AvgThreshold = 0;
+
+            StepTimeInTicks = (long)Pf * (long)Cfg.TimeStepFreqChngMs / 1000L;
+
+            Logger.WriteLog(StartPc, "session_start",
+                $"startFreq={startFreq};stepHz={Cfg.StepJumpFreq};stepTime={Cfg.TimeStepFreqChngMs};" +
+                $"target={TwoDigitNumber};minIters={IteratinsCount};sigmaMax={Cfg.StdDevThreshold:0.###};randDigits={NeedRandomDigits}");
+
             _sweepDir = -1; // начнём с понижения
 
             if (_SndPlayer != null)
@@ -1072,7 +1321,6 @@ namespace DFlasher
                 _SndPlayer.Play("shep_down", true);
             }
 
-            // Обновим UI
             _ui.Post(_ =>
             {
                 txtBxCurItertn.Text = "0";
@@ -1080,49 +1328,120 @@ namespace DFlasher
                 txtBxAvrgThresshld.Text = "";
                 txtBxCurSigma.Text = "";
                 txtBxCurFreq.Text = CurrentFreq.ToString();
-
-                // <<< опционально, но очень полезно:
-                btnStart.Enabled = false;
-                btnStop.Enabled = true;
-                this.ActiveControl = label6;
             }, null);
-            // С этого момента считаем, что сессия реально запускается
+
             WrkState = WS.wsFreqSearch;
         }
 
+        private void StartSequentialMode()
+        {
+            if (Cfg.Stimulus == null || Cfg.Stimulus.Count == 0)
+            {
+                MessageBox.Show("Список стимулов пуст.", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                _ui.Post(_ => { btnStart.Enabled = true; btnStop.Enabled = false; }, null);
+                return;
+            }
+
+            _seqIndex = 0;
+            _digitBuf.Clear();
+
+            _seqInputStarted = false;
+            _seqFirstKeyPc = 0;
+
+            _seqState = TPresentationState.Presenting;
+
+            var s = Cfg.Stimulus[_seqIndex];
+
+            QueryPerformanceCounter(out _seqStimulusStartPc);
+
+            comm.WriteData(CurrentDigitCmd + ToHardwareDigit(s.Digits));
+            comm.WriteData(CurrentFreqCmd + s.Frequency);
+            CurrentFreq = s.Frequency;
+
+            // UI — номер текущего
+            _ui.Post(_ =>
+            {
+                txtBxCurItertn.Text = "1";
+            }, null);
+
+            Logger.WriteLog(_seqStimulusStartPc,
+                "stimulus_start",
+                $"idx={_seqIndex};digits={s.Digits};freq={s.Frequency};dur={s.Duration};needReaction={(s.NeedReaction ? 1 : 0)}");
+        }
+        private void StopSequential(long pcNow, string reason, bool isManualStop)
+        {
+            // защита от повторного стопа (иначе будут дубль-логи)
+            if (_seqState == TPresentationState.Stopped)
+                return;
+
+            _sessionRunning = false;
+            _seqState = TPresentationState.Stopped;
+
+            // на стопе частота 196, цифра остаётся текущая
+            comm.WriteData(CurrentFreqCmd + "196");
+            CurrentFreq = 196;
+
+            // ЛОГИ:
+            // - sequence_end только если действительно дошли до конца списка
+            bool completed = (Cfg.Stimulus != null && _seqIndex >= Cfg.Stimulus.Count);
+
+            if (completed && !isManualStop)
+            {
+                Logger.WriteLog(pcNow, "sequence_end", "");
+            }
+            else
+            {
+                // всё остальное — отдельное событие
+                string modeReason = $"mode=Sequential;reason={reason}";
+                Logger.WriteLog(pcNow, "sequence_stop", modeReason);
+            }
+
+            Logger.Flush();
+
+            _ui.Post(_ =>
+            {
+                btnStart.Enabled = true;
+                btnStop.Enabled = false;
+            }, null);
+        }
         private void btnStop_Click(object sender, EventArgs e)
         {
             if (!comm.ComPortIsOpen)
                 return;
 
-            // Если уже остановлены — ничего не делаем
+            bool seqRunning = (Cfg.Mode == ExperimentMode.Sequential) &&
+                              (_seqState != TPresentationState.None) &&
+                              (_seqState != TPresentationState.Stopped);
+
+            if (Cfg.Mode == ExperimentMode.Sequential)
+            {
+                if (!seqRunning) return;
+
+                QueryPerformanceCounter(out long pcNow);
+                StopSequential(pcNow, "manual", true);
+                return;
+            }
+
+            // ===== Staircase как было (у тебя можно оставить старый код) =====
             if (WrkState == WS.wsStoped)
                 return;
 
             WrkState = WS.wsStoped;
+            _sessionRunning = false;
 
-            // Зафиксируем текущее состояние
-            QueryPerformanceCounter(out long pcNow);
-            Logger.WriteLog(pcNow, "session_stop", $"reason=manual;freq={CurrentFreq} target_final= {TwoDigitNumber}");
+            QueryPerformanceCounter(out long pcNow2);
+            Logger.WriteLog(pcNow2, "session_stop", $"reason=manual;freq={CurrentFreq} target_final= {TwoDigitNumber}");
 
-            // Вернуть стимуляцию к начальному значению (если так задумано)
             comm.WriteData(CurrentFreqCmd + Cfg.StartingFreq.ToString());
-
             Logger.Flush();
 
             if (_SndPlayer != null)
-            {
                 _SndPlayer.StopAll();
-            }
 
-            // UI: обновим поля
             _ui.Post(_ =>
             {
-                //txtBxCurItertn.Text = CurrentIteration.ToString();
-                //txtBxCurThresshld.Text = CurrentFreq.ToString("0.###");
-                //txtBxCurSigma.Text = "";
-
-                // кнопки в состояние «можно снова стартовать»
                 btnStart.Enabled = true;
                 btnStop.Enabled = false;
             }, null);
@@ -1155,8 +1474,11 @@ namespace DFlasher
 
         private void frmMain_KeyDown(object sender, KeyEventArgs e)
         {
-            // Если идёт эксперимент, не даём Enter сработать как "клик по кнопке"
-            if (e.KeyCode == Keys.Enter && WrkState != WS.wsStoped)
+            bool seqRunning = (Cfg.Mode == ExperimentMode.Sequential) &&
+                              (_seqState != TPresentationState.None) &&
+                              (_seqState != TPresentationState.Stopped);
+
+            if (e.KeyCode == Keys.Enter && (WrkState != WS.wsStoped || seqRunning))
             {
                 e.Handled = true;
                 e.SuppressKeyPress = true;
@@ -1184,6 +1506,219 @@ namespace DFlasher
             // Для удобства: выделим текст, чтобы можно было сразу перезатереть
             txtSend.SelectAll();
             txtSend.Focus();
+        }
+
+        private void btnAddStim_Click(object sender, EventArgs e)
+        {
+            Stimulus stm = new Stimulus(true);
+            stm.Digits = GenerateAllowedTwoDigitNumber();
+            stm.Duration = 5000;
+            stm.NeedReaction = true;
+
+            Cfg.Stimulus.Add(stm);
+
+            lstBxStimWorkSequence.BeginUpdate();
+            int stimCnt = Cfg.Stimulus.Count;
+            lstBxStimWorkSequence.Items.Add(stimCnt.ToString() + ". " + stm.Digits);
+            if (Cfg.Stimulus.Count > 0)
+            {
+                for (int i = 0; i < Cfg.Stimulus.Count; i++)
+                    lstBxStimWorkSequence.SetSelected(i, false);
+                lstBxStimWorkSequence.SetSelected(Cfg.Stimulus.Count - 1, true);
+            }
+            lstBxStimWorkSequence.EndUpdate();            
+        }
+
+        private void btnRemoveStim_Click(object sender, EventArgs e)
+        {
+            if (lstBxStimWorkSequence.SelectedIndex != -1 && lstBxStimWorkSequence.SelectedIndex != -1)
+            {
+                Cfg.Stimulus.RemoveAt(lstBxStimWorkSequence.SelectedIndex);
+                lstBxStimWorkSequence.Items.Remove(lstBxStimWorkSequence.SelectedItem);
+                for (int i = 0; i < lstBxStimWorkSequence.Items.Count; i++)
+                {
+                    string[] words = lstBxStimWorkSequence.Items[i].ToString().Split(new char[] { ' ' });
+                    lstBxStimWorkSequence.Items[i] = (i + 1).ToString() + ". " + words[1];
+                }
+            }
+        }
+
+        private void lstBxStimWorkSequence_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lstBxStimWorkSequence.SelectedIndex != -1)
+            {
+                Stimulus stm = Cfg.Stimulus[lstBxStimWorkSequence.SelectedIndex];
+                GVars.LockCtrl = true;
+                numUpDwnStartingFreqSequentialMode.Value = stm.Frequency;
+                numUpDwnTimeStepFreqChngSequentialMode.Value = stm.Duration;
+                GVars.LockCtrl = false;
+            }
+        }
+
+        private void btnClearStim_Click(object sender, EventArgs e)
+        {
+            Cfg.Stimulus.Clear();
+            lstBxStimWorkSequence.Items.Clear();
+        }
+
+        private void numUpDwnStartingFreqSequentialMode_ValueChanged(object sender, EventArgs e)
+        {
+            if (!GVars.LockCtrl)
+            {
+                foreach (int SelectedIndex in lstBxStimWorkSequence.SelectedIndices)
+                {
+                    Stimulus stm = Cfg.Stimulus[SelectedIndex];
+                    stm.Frequency = (int)numUpDwnStartingFreqSequentialMode.Value;
+                    Cfg.Stimulus[SelectedIndex] = stm;
+                }
+            }
+        }
+
+        private void numUpDwnTimeStepFreqChngSequentialMode_ValueChanged(object sender, EventArgs e)
+        {
+            if (!GVars.LockCtrl)
+            {
+                foreach (int SelectedIndex in lstBxStimWorkSequence.SelectedIndices)
+                {
+                    Stimulus stm = Cfg.Stimulus[SelectedIndex];
+                    stm.Duration = (int)numUpDwnTimeStepFreqChngSequentialMode.Value;
+                    Cfg.Stimulus[SelectedIndex] = stm;
+                }
+            }
+        }
+
+        private bool TryParseStimulusLine(string line, out Stimulus stim)
+        {
+            stim = new Stimulus(true);
+
+            if (string.IsNullOrWhiteSpace(line))
+                return false;
+
+            var parts = line.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var p in parts)
+            {
+                var kv = p.Split('=');
+                if (kv.Length != 2)
+                    continue;
+
+                string key = kv[0].Trim().ToLower();
+                string val = kv[1].Trim();
+
+                switch (key)
+                {
+                    case "digits":
+                        if (int.TryParse(val, out int d))
+                            stim.Digits = d;
+                        break;
+
+                    case "freq":
+                        if (int.TryParse(val, out int f))
+                            stim.Frequency = f;
+                        break;
+
+                    case "dur":
+                        if (int.TryParse(val, out int dur))
+                            stim.Duration = dur;
+                        break;
+
+                    case "needreaction":
+                        stim.NeedReaction = val.Equals("true", StringComparison.OrdinalIgnoreCase);
+                        break;
+                }
+            }
+
+            return true;
+        }
+
+        private void RefreshStimulusListBox()
+        {
+            lstBxStimWorkSequence.Items.Clear();
+
+            for (int i = 0; i < Cfg.Stimulus.Count; i++)
+            {
+                var s = Cfg.Stimulus[i];
+                lstBxStimWorkSequence.Items.Add($"{i + 1}. {s.Digits}");
+            }
+        }
+
+        private void btnLoadListStimulus_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog dlg = new OpenFileDialog())
+            {
+                dlg.Filter = "Stimulus list (*.txt)|*.txt|All files (*.*)|*.*";
+                dlg.Title = "Загрузить список стимулов";
+
+                if (dlg.ShowDialog() != DialogResult.OK)
+                    return;
+
+                try
+                {
+                    var lines = File.ReadAllLines(dlg.FileName);
+
+                    var newList = new List<Stimulus>();
+
+                    foreach (var line in lines)
+                    {
+                        if (TryParseStimulusLine(line, out Stimulus s))
+                            newList.Add(s);
+                    }
+
+                    if (newList.Count == 0)
+                    {
+                        MessageBox.Show("В файле нет валидных стимулов.",
+                            "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    Cfg.Stimulus.Clear();
+                    Cfg.Stimulus.AddRange(newList);
+
+                    RefreshStimulusListBox();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка загрузки:\n" + ex.Message,
+                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+        public string StimulusToLine(Stimulus s)
+        {
+            return
+                $"digits={s.Digits};freq={s.Frequency};dur={s.Duration};needReaction={(s.NeedReaction ? "true" : "false")}";
+        }
+        private void btnSaveListStimulus_Click(object sender, EventArgs e)
+        {
+            if (Cfg.Stimulus == null || Cfg.Stimulus.Count == 0)
+            {
+                MessageBox.Show("Список стимулов пуст.",
+                    "Сохранение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            using (SaveFileDialog dlg = new SaveFileDialog())
+            {
+                dlg.Filter = "Stimulus list (*.txt)|*.txt|All files (*.*)|*.*";
+                dlg.Title = "Сохранить список стимулов";
+                dlg.FileName = "stimulus_list.txt";
+
+                if (dlg.ShowDialog() != DialogResult.OK)
+                    return;
+
+                try
+                {
+                    var lines = Cfg.Stimulus
+                        .Select(s => StimulusToLine(s))
+                        .ToArray();
+
+                    File.WriteAllLines(dlg.FileName, lines);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка сохранения:\n" + ex.Message,
+                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }

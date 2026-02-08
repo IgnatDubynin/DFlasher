@@ -33,10 +33,14 @@ namespace DFlasher
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.grpBxExperimentMode = new System.Windows.Forms.GroupBox();
+            this.label32 = new System.Windows.Forms.Label();
+            this.txtBxDigitsForExclusion = new System.Windows.Forms.TextBox();
+            this.chckBxNeedRndDigits = new System.Windows.Forms.CheckBox();
             this.rdoBtnSequential = new System.Windows.Forms.RadioButton();
             this.rdoBtnStaircase = new System.Windows.Forms.RadioButton();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.numUpDwnItrtnCount = new System.Windows.Forms.NumericUpDown();
             this.numUpDwnStepClarifyThrshld = new System.Windows.Forms.NumericUpDown();
             this.numUpDwnStdDevIn3Itrtn = new System.Windows.Forms.NumericUpDown();
             this.numUpDwnTimeStepFreqChng = new System.Windows.Forms.NumericUpDown();
@@ -114,16 +118,19 @@ namespace DFlasher
             this.btnDebug = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
-            this.chckBxNeedRndDigits = new System.Windows.Forms.CheckBox();
-            this.numUpDwnItrtnCount = new System.Windows.Forms.NumericUpDown();
-            this.txtBxDigitsForExclusion = new System.Windows.Forms.TextBox();
-            this.label32 = new System.Windows.Forms.Label();
+            this.lstBxStimWorkSequence = new System.Windows.Forms.ListBox();
+            this.btnClearStim = new System.Windows.Forms.Button();
+            this.btnRemoveStim = new System.Windows.Forms.Button();
+            this.btnAddStim = new System.Windows.Forms.Button();
+            this.btnLoadListStimulus = new System.Windows.Forms.Button();
+            this.btnSaveListStimulus = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.grpBxExperimentMode.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnItrtnCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStepClarifyThrshld)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStdDevIn3Itrtn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTimeStepFreqChng)).BeginInit();
@@ -143,7 +150,6 @@ namespace DFlasher
             this.GroupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnItrtnCount)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -153,28 +159,28 @@ namespace DFlasher
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(812, 468);
+            this.tabControl1.Size = new System.Drawing.Size(962, 622);
             this.tabControl1.TabIndex = 15;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.grpBxExperimentMode);
             this.tabPage1.Controls.Add(this.groupBox5);
             this.tabPage1.Controls.Add(this.groupBox8);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(804, 442);
+            this.tabPage1.Size = new System.Drawing.Size(954, 596);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "MainTab";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // groupBox5
             // 
-            this.groupBox5.Controls.Add(this.grpBxExperimentMode);
             this.groupBox5.Controls.Add(this.tabControl2);
             this.groupBox5.Location = new System.Drawing.Point(6, 9);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(369, 414);
+            this.groupBox5.Size = new System.Drawing.Size(533, 432);
             this.groupBox5.TabIndex = 4;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "ExpSettings";
@@ -186,12 +192,40 @@ namespace DFlasher
             this.grpBxExperimentMode.Controls.Add(this.chckBxNeedRndDigits);
             this.grpBxExperimentMode.Controls.Add(this.rdoBtnSequential);
             this.grpBxExperimentMode.Controls.Add(this.rdoBtnStaircase);
-            this.grpBxExperimentMode.Location = new System.Drawing.Point(6, 252);
+            this.grpBxExperimentMode.Location = new System.Drawing.Point(6, 447);
             this.grpBxExperimentMode.Name = "grpBxExperimentMode";
             this.grpBxExperimentMode.Size = new System.Drawing.Size(353, 143);
             this.grpBxExperimentMode.TabIndex = 4;
             this.grpBxExperimentMode.TabStop = false;
             this.grpBxExperimentMode.Text = "ExperimentMode";
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(8, 39);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(98, 13);
+            this.label32.TabIndex = 63;
+            this.label32.Text = "Digits for exclusion:";
+            // 
+            // txtBxDigitsForExclusion
+            // 
+            this.txtBxDigitsForExclusion.Location = new System.Drawing.Point(9, 60);
+            this.txtBxDigitsForExclusion.Name = "txtBxDigitsForExclusion";
+            this.txtBxDigitsForExclusion.Size = new System.Drawing.Size(322, 20);
+            this.txtBxDigitsForExclusion.TabIndex = 3;
+            // 
+            // chckBxNeedRndDigits
+            // 
+            this.chckBxNeedRndDigits.AutoSize = true;
+            this.chckBxNeedRndDigits.Checked = true;
+            this.chckBxNeedRndDigits.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chckBxNeedRndDigits.Location = new System.Drawing.Point(9, 19);
+            this.chckBxNeedRndDigits.Name = "chckBxNeedRndDigits";
+            this.chckBxNeedRndDigits.Size = new System.Drawing.Size(124, 17);
+            this.chckBxNeedRndDigits.TabIndex = 2;
+            this.chckBxNeedRndDigits.Text = "Need Random Digits";
+            this.chckBxNeedRndDigits.UseVisualStyleBackColor = true;
             // 
             // rdoBtnSequential
             // 
@@ -202,7 +236,6 @@ namespace DFlasher
             this.rdoBtnSequential.TabIndex = 1;
             this.rdoBtnSequential.Text = "Sequential";
             this.rdoBtnSequential.UseVisualStyleBackColor = true;
-            this.rdoBtnSequential.Visible = false;
             // 
             // rdoBtnStaircase
             // 
@@ -215,7 +248,6 @@ namespace DFlasher
             this.rdoBtnStaircase.TabStop = true;
             this.rdoBtnStaircase.Text = "Staircase";
             this.rdoBtnStaircase.UseVisualStyleBackColor = true;
-            this.rdoBtnStaircase.Visible = false;
             // 
             // tabControl2
             // 
@@ -224,7 +256,7 @@ namespace DFlasher
             this.tabControl2.Location = new System.Drawing.Point(4, 19);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(359, 227);
+            this.tabControl2.Size = new System.Drawing.Size(523, 407);
             this.tabControl2.TabIndex = 3;
             // 
             // tabPage3
@@ -249,10 +281,32 @@ namespace DFlasher
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(351, 201);
+            this.tabPage3.Size = new System.Drawing.Size(515, 381);
             this.tabPage3.TabIndex = 0;
             this.tabPage3.Text = "Staircase";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // numUpDwnItrtnCount
+            // 
+            this.numUpDwnItrtnCount.Location = new System.Drawing.Point(115, 115);
+            this.numUpDwnItrtnCount.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.numUpDwnItrtnCount.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numUpDwnItrtnCount.Name = "numUpDwnItrtnCount";
+            this.numUpDwnItrtnCount.Size = new System.Drawing.Size(50, 20);
+            this.numUpDwnItrtnCount.TabIndex = 78;
+            this.numUpDwnItrtnCount.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
             // 
             // numUpDwnStepClarifyThrshld
             // 
@@ -445,6 +499,12 @@ namespace DFlasher
             // 
             // tabPage4
             // 
+            this.tabPage4.Controls.Add(this.btnSaveListStimulus);
+            this.tabPage4.Controls.Add(this.btnLoadListStimulus);
+            this.tabPage4.Controls.Add(this.btnClearStim);
+            this.tabPage4.Controls.Add(this.btnRemoveStim);
+            this.tabPage4.Controls.Add(this.btnAddStim);
+            this.tabPage4.Controls.Add(this.lstBxStimWorkSequence);
             this.tabPage4.Controls.Add(this.numUpDwnBrightnessSequentialMode);
             this.tabPage4.Controls.Add(this.label30);
             this.tabPage4.Controls.Add(this.numUpDwnTrialCount);
@@ -458,7 +518,7 @@ namespace DFlasher
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(351, 201);
+            this.tabPage4.Size = new System.Drawing.Size(515, 381);
             this.tabPage4.TabIndex = 1;
             this.tabPage4.Text = "Sequential";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -522,7 +582,6 @@ namespace DFlasher
             // 
             // numUpDwnTimeStepFreqChngSequentialMode
             // 
-            this.numUpDwnTimeStepFreqChngSequentialMode.Enabled = false;
             this.numUpDwnTimeStepFreqChngSequentialMode.Location = new System.Drawing.Point(253, 30);
             this.numUpDwnTimeStepFreqChngSequentialMode.Maximum = new decimal(new int[] {
             10000,
@@ -542,6 +601,7 @@ namespace DFlasher
             0,
             0,
             0});
+            this.numUpDwnTimeStepFreqChngSequentialMode.ValueChanged += new System.EventHandler(this.numUpDwnTimeStepFreqChngSequentialMode_ValueChanged);
             // 
             // label28
             // 
@@ -557,9 +617,9 @@ namespace DFlasher
             this.label29.AutoSize = true;
             this.label29.Location = new System.Drawing.Point(12, 32);
             this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(121, 13);
+            this.label29.Size = new System.Drawing.Size(90, 13);
             this.label29.TabIndex = 61;
-            this.label29.Text = "Time Step Freq change:";
+            this.label29.Text = "Stimulus duration:";
             // 
             // numUpDwnStartingFreqSequentialMode
             // 
@@ -577,6 +637,7 @@ namespace DFlasher
             0,
             0,
             0});
+            this.numUpDwnStartingFreqSequentialMode.ValueChanged += new System.EventHandler(this.numUpDwnStartingFreqSequentialMode_ValueChanged);
             // 
             // label25
             // 
@@ -592,9 +653,9 @@ namespace DFlasher
             this.label27.AutoSize = true;
             this.label27.Location = new System.Drawing.Point(12, 6);
             this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(70, 13);
+            this.label27.Size = new System.Drawing.Size(73, 13);
             this.label27.TabIndex = 58;
-            this.label27.Text = "Starting Freq:";
+            this.label27.Text = "Stimulus Freq:";
             // 
             // groupBox8
             // 
@@ -610,7 +671,7 @@ namespace DFlasher
             this.groupBox8.Controls.Add(this.label19);
             this.groupBox8.Controls.Add(this.txtBxExpTime);
             this.groupBox8.Controls.Add(this.label17);
-            this.groupBox8.Location = new System.Drawing.Point(381, 6);
+            this.groupBox8.Location = new System.Drawing.Point(545, 6);
             this.groupBox8.Name = "groupBox8";
             this.groupBox8.Size = new System.Drawing.Size(403, 246);
             this.groupBox8.TabIndex = 1;
@@ -703,9 +764,9 @@ namespace DFlasher
             this.label19.AutoSize = true;
             this.label19.Location = new System.Drawing.Point(16, 55);
             this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(85, 13);
+            this.label19.Size = new System.Drawing.Size(127, 13);
             this.label19.TabIndex = 50;
-            this.label19.Text = "Current Iteration:";
+            this.label19.Text = "Current Iteration/stimulus:";
             // 
             // txtBxExpTime
             // 
@@ -736,7 +797,7 @@ namespace DFlasher
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(804, 442);
+            this.tabPage2.Size = new System.Drawing.Size(954, 596);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Settings";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -1088,7 +1149,7 @@ namespace DFlasher
             // 
             // btnDebug
             // 
-            this.btnDebug.Location = new System.Drawing.Point(640, 500);
+            this.btnDebug.Location = new System.Drawing.Point(637, 655);
             this.btnDebug.Name = "btnDebug";
             this.btnDebug.Size = new System.Drawing.Size(75, 23);
             this.btnDebug.TabIndex = 4;
@@ -1099,7 +1160,7 @@ namespace DFlasher
             // 
             // btnStop
             // 
-            this.btnStop.Location = new System.Drawing.Point(353, 500);
+            this.btnStop.Location = new System.Drawing.Point(350, 655);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(75, 23);
             this.btnStop.TabIndex = 17;
@@ -1109,7 +1170,7 @@ namespace DFlasher
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(258, 500);
+            this.btnStart.Location = new System.Drawing.Point(255, 655);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 23);
             this.btnStart.TabIndex = 16;
@@ -1117,61 +1178,71 @@ namespace DFlasher
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
-            // chckBxNeedRndDigits
+            // lstBxStimWorkSequence
             // 
-            this.chckBxNeedRndDigits.AutoSize = true;
-            this.chckBxNeedRndDigits.Checked = true;
-            this.chckBxNeedRndDigits.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chckBxNeedRndDigits.Location = new System.Drawing.Point(9, 19);
-            this.chckBxNeedRndDigits.Name = "chckBxNeedRndDigits";
-            this.chckBxNeedRndDigits.Size = new System.Drawing.Size(124, 17);
-            this.chckBxNeedRndDigits.TabIndex = 2;
-            this.chckBxNeedRndDigits.Text = "Need Random Digits";
-            this.chckBxNeedRndDigits.UseVisualStyleBackColor = true;
+            this.lstBxStimWorkSequence.FormattingEnabled = true;
+            this.lstBxStimWorkSequence.Location = new System.Drawing.Point(15, 119);
+            this.lstBxStimWorkSequence.Name = "lstBxStimWorkSequence";
+            this.lstBxStimWorkSequence.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.lstBxStimWorkSequence.Size = new System.Drawing.Size(277, 251);
+            this.lstBxStimWorkSequence.TabIndex = 80;
+            this.lstBxStimWorkSequence.SelectedIndexChanged += new System.EventHandler(this.lstBxStimWorkSequence_SelectedIndexChanged);
             // 
-            // numUpDwnItrtnCount
+            // btnClearStim
             // 
-            this.numUpDwnItrtnCount.Location = new System.Drawing.Point(115, 115);
-            this.numUpDwnItrtnCount.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.numUpDwnItrtnCount.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numUpDwnItrtnCount.Name = "numUpDwnItrtnCount";
-            this.numUpDwnItrtnCount.Size = new System.Drawing.Size(50, 20);
-            this.numUpDwnItrtnCount.TabIndex = 78;
-            this.numUpDwnItrtnCount.Value = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
+            this.btnClearStim.Location = new System.Drawing.Point(312, 177);
+            this.btnClearStim.Name = "btnClearStim";
+            this.btnClearStim.Size = new System.Drawing.Size(98, 23);
+            this.btnClearStim.TabIndex = 83;
+            this.btnClearStim.Text = "ClearStim";
+            this.btnClearStim.UseVisualStyleBackColor = true;
+            this.btnClearStim.Click += new System.EventHandler(this.btnClearStim_Click);
             // 
-            // txtBxDigitsForExclusion
+            // btnRemoveStim
             // 
-            this.txtBxDigitsForExclusion.Location = new System.Drawing.Point(9, 60);
-            this.txtBxDigitsForExclusion.Name = "txtBxDigitsForExclusion";
-            this.txtBxDigitsForExclusion.Size = new System.Drawing.Size(322, 20);
-            this.txtBxDigitsForExclusion.TabIndex = 3;
+            this.btnRemoveStim.Location = new System.Drawing.Point(312, 148);
+            this.btnRemoveStim.Name = "btnRemoveStim";
+            this.btnRemoveStim.Size = new System.Drawing.Size(98, 23);
+            this.btnRemoveStim.TabIndex = 82;
+            this.btnRemoveStim.Text = "Remove stim";
+            this.btnRemoveStim.UseVisualStyleBackColor = true;
+            this.btnRemoveStim.Click += new System.EventHandler(this.btnRemoveStim_Click);
             // 
-            // label32
+            // btnAddStim
             // 
-            this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(8, 39);
-            this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(98, 13);
-            this.label32.TabIndex = 63;
-            this.label32.Text = "Digits for exclusion:";
+            this.btnAddStim.Location = new System.Drawing.Point(312, 119);
+            this.btnAddStim.Name = "btnAddStim";
+            this.btnAddStim.Size = new System.Drawing.Size(98, 23);
+            this.btnAddStim.TabIndex = 81;
+            this.btnAddStim.Text = "Add stim";
+            this.btnAddStim.UseVisualStyleBackColor = true;
+            this.btnAddStim.Click += new System.EventHandler(this.btnAddStim_Click);
+            // 
+            // btnLoadListStimulus
+            // 
+            this.btnLoadListStimulus.Location = new System.Drawing.Point(312, 225);
+            this.btnLoadListStimulus.Name = "btnLoadListStimulus";
+            this.btnLoadListStimulus.Size = new System.Drawing.Size(98, 23);
+            this.btnLoadListStimulus.TabIndex = 84;
+            this.btnLoadListStimulus.Text = "Load list stimulus";
+            this.btnLoadListStimulus.UseVisualStyleBackColor = true;
+            this.btnLoadListStimulus.Click += new System.EventHandler(this.btnLoadListStimulus_Click);
+            // 
+            // btnSaveListStimulus
+            // 
+            this.btnSaveListStimulus.Location = new System.Drawing.Point(312, 254);
+            this.btnSaveListStimulus.Name = "btnSaveListStimulus";
+            this.btnSaveListStimulus.Size = new System.Drawing.Size(98, 23);
+            this.btnSaveListStimulus.TabIndex = 85;
+            this.btnSaveListStimulus.Text = "Save list stimulus";
+            this.btnSaveListStimulus.UseVisualStyleBackColor = true;
+            this.btnSaveListStimulus.Click += new System.EventHandler(this.btnSaveListStimulus_Click);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(836, 538);
+            this.ClientSize = new System.Drawing.Size(986, 701);
             this.Controls.Add(this.btnDebug);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.btnStart);
@@ -1192,6 +1263,7 @@ namespace DFlasher
             this.tabControl2.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnItrtnCount)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStepClarifyThrshld)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnStdDevIn3Itrtn)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numUpDwnTimeStepFreqChng)).EndInit();
@@ -1217,7 +1289,6 @@ namespace DFlasher
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numUpDwnItrtnCount)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1313,6 +1384,12 @@ namespace DFlasher
         private System.Windows.Forms.NumericUpDown numUpDwnItrtnCount;
         private System.Windows.Forms.Label label32;
         private System.Windows.Forms.TextBox txtBxDigitsForExclusion;
+        private System.Windows.Forms.Button btnClearStim;
+        private System.Windows.Forms.Button btnRemoveStim;
+        private System.Windows.Forms.Button btnAddStim;
+        private System.Windows.Forms.ListBox lstBxStimWorkSequence;
+        private System.Windows.Forms.Button btnSaveListStimulus;
+        private System.Windows.Forms.Button btnLoadListStimulus;
     }
 }
 

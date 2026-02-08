@@ -1,0 +1,7 @@
+digits=63;freq=20;dur=5000;needReaction=true
+digits=25;freq=10;dur=5000;needReaction=true
+digits=85;freq=5;dur=5000;needReaction=true
+digits=53;freq=15;dur=5000;needReaction=true
+digits=39;freq=30;dur=5000;needReaction=true
+digits=45;freq=55;dur=5000;needReaction=true
+digits=98;freq=5;dur=5000;needReaction=true
